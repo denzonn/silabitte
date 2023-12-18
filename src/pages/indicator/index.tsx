@@ -1,18 +1,192 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../../component/Button";
 import Input from "../../component/Input";
 import Popup from "../../component/Popup";
 import Sidebar from "../../component/Sidebar";
 import Breadcrumb from "../../component/Breadcrumb";
+import axios from "axios";
+import Cookie from "js-cookie";
+import toast from "react-hot-toast";
+import { useFormik } from "formik";
+import { validateIndicator } from "../../validation/auth";
+
+interface IndicatorProps {
+  indicator?: string;
+  unit?: string;
+  gender?: string;
+  from_age?: string;
+  to_age?: string;
+  limit_grade_1?: string;
+  limit_grade_2?: string;
+  limit_grade_3?: string;
+  type_livestock_id?: string;
+}
 
 const Indicator = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
+  const [data, setData] = useState<IndicatorProps>();
+  const token = Cookie.get("token");
+  const [id, setId] = useState<number>(0);
+  const [dataEdit, setDataEdit] = useState<IndicatorProps>();
+
   const [add, setAdd] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
 
-  const [type, setType] = useState<string>("");
+  const [livestock_type, setLivestock_type] = useState<any>();
+  
+  const getType = () => {
+    axios
+      .get("/api/type-livestock", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setLivestock_type(res?.data?.data?.data);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
+  };
+
+  const getData = () => {
+    axios
+      .get("/api/indicator", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setData(res?.data?.data?.data);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      indicator: "",
+      unit: "",
+      gender: "",
+      from_age: "",
+      to_age: "",
+      limit_grade_1: "",
+      limit_grade_2: "",
+      limit_grade_3: "",
+      type_livestock_id: "",
+    },
+    validationSchema: validateIndicator,
+    onSubmit: (values) => {
+      axios
+        .post("/api/indicator", values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          toast.success("Berhasil Menambahkan Indikator");
+          setAdd(false);
+          getData();
+          formik.resetForm();
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
+    },
+  });
+
+  const getEditData = (id: string) => {
+    axios
+      .get(`/api/indicator/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setEdit(!edit);
+        setId(res?.data?.data?.id);
+        setDataEdit(res?.data?.data);
+        initializeFormik(res?.data?.data);
+      });
+  };
+
+  const initializeFormik = (data: any) => {
+    editFormik.setValues({
+      indicator: data?.indicator || "",
+      unit: data?.unit || "",
+      gender: data?.gender || "",
+      from_age: data?.from_age || "",
+      to_age: data?.to_age || "",
+      limit_grade_1: data?.limit_grade_1 || "",
+      limit_grade_2: data?.limit_grade_2 || "",
+      limit_grade_3: data?.limit_grade_3 || "",
+      type_livestock_id: data?.type_livestock_id || "",
+    });
+  };
+
+  const editFormik = useFormik({
+    initialValues: {
+      indicator: "",
+      unit: "",
+      gender: "",
+      from_age: "",
+      to_age: "",
+      limit_grade_1: "",
+      limit_grade_2: "",
+      limit_grade_3: "",
+      type_livestock_id: "",
+    },
+    validationSchema: validateIndicator,
+    onSubmit: (values) => {
+      axios
+        .put(`/api/indicator/${id}`, values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          toast.success("Berhasil Mengupdate Indikator");
+          setEdit(false);
+          getData();
+          editFormik.resetForm();
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
+    },
+  });
+
+  const getDestroy = (id: string) => {
+    toast.promise(
+      axios
+        .delete(`/api/indicator/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          getData();
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        }),
+      {
+        loading: "Menghapus...",
+        success: "Berhasil Menghapus Indikator...",
+        error: (error) => {
+          toast.error(error.message);
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    getType();
+    getData();
+  }, []);
 
   return (
     <section>
@@ -40,29 +214,36 @@ const Indicator = () => {
               <thead>
                 <tr className="border-b-gray-200 text-gray-400 text-sm font-medium">
                   <td>No</td>
-                  <td>Jenis</td>
                   <td>Indikator</td>
-                  <td>Satuan</td>
-                  <td>Is Active</td>
-                  <td>Jenis Kelamin</td>
-                  <td>Umur</td>
+                  <td>Jenis Ternak</td>
                   <td></td>
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                <tr className="border-b-gray-200">
-                  <td>1</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>
-                    <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
-                    <i className="fa-solid fa-trash cursor-pointer ml-2"></i>
-                  </td>
-                </tr>
+                {data?.length > 0 ? (
+                  data?.map((item: IndicatorProps, index: number) => {
+                    return (
+                      <tr className="border-b-gray-200" key={index}>
+                        <td>{index + 1}</td>
+                        <td>{item?.indicator}</td>
+                        <td>{item?.type_live_stock?.type}</td>
+                        <td>
+                          <i
+                            className="fa-solid fa-pen-to-square cursor-pointer ml-2"
+                            onClick={() => getEditData(item?.id)}
+                          ></i>
+                          <i className="fa-solid fa-trash cursor-pointer ml-2" onClick={() => getDestroy(item?.id)}></i>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr className="border-b-gray-200">
+                    <td colSpan={6} className="text-center">
+                      Tidak ada Permohonan
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -80,9 +261,7 @@ const Indicator = () => {
                 <div className="mb-4 text-xl text-center font-bold text-black">
                   Tambahkan Indikator
                 </div>
-                <form
-                // onSubmit={formik.handleSubmit}
-                >
+                <form onSubmit={formik.handleSubmit}>
                   <div className=" grid grid-cols-2 gap-x-5">
                     <div>
                       <label
@@ -92,23 +271,20 @@ const Indicator = () => {
                       </label>
                       <select
                         className="select select-bordered w-full bg-transparent mb-4 mt-0 focus:outline-none text-[#697a8d] max-h-[2.6rem] min-h-[2.6rem]"
-                        name="jenis_ternak"
-                        onChange={(e) => setType(e.target.value)}
-                        // onChange={formik.handleChange}
+                        name="type_livestock_id"
+                        onChange={formik.handleChange}
                       >
                         <option disabled selected>
                           Pilih Jenis Ternak
                         </option>
-                        <option value="Sapi Potong">Sapi Potong</option>
-                        <option value="Sapi Perah">Sapi Perah</option>
-                        <option value="Kerbau">Kerbau</option>
-                        <option value="Kambing / Domba">Kambing / Domba</option>
+                        {livestock_type?.map((item, index) => {
+                          return (
+                            <option value={item?.id}>
+                              {item?.type?.toLocaleUpperCase()}
+                            </option>
+                          );
+                        })}
                       </select>
-                      {/* {formik.touched.status && formik.errors.status ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.status}
-                      </div>
-                    ) : null} */}
                     </div>
                     <div>
                       <Input
@@ -116,16 +292,16 @@ const Indicator = () => {
                         label="Indikator"
                         placeholder="Masukkan Indikator"
                         name="indicator"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        value={formik.values.indicator}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.indicator && formik.errors.indicator ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.indicator}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-x-5">
@@ -134,43 +310,18 @@ const Indicator = () => {
                         admin
                         label="Satuan"
                         placeholder="Masukkan Satuan"
-                        name="satuan"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        name="unit"
+                        value={formik.values.unit}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.unit && formik.errors.unit ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.unit}
+                        </div>
+                      ) : null}
                     </div>
-                    <div>
-                      <label
-                        className={`text-[#697a8d] text-sm mb-1 after:content-["*"] after:text-red-600 after:ml-1 `}
-                      >
-                        Is Active
-                      </label>
-                      <select
-                        className="select select-bordered w-full bg-transparent mb-4 mt-0 focus:outline-none text-[#697a8d] max-h-[2.6rem] min-h-[2.6rem]"
-                        name="is_active"
-                        // onChange={formik.handleChange}
-                      >
-                        <option disabled selected>
-                          Pilih Is Active
-                        </option>
-                        <option value="Active">Active</option>
-                        <option value="Non Active">Non Active</option>
-                      </select>
-                      {/* {formik.touched.status && formik.errors.status ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.status}
-                      </div>
-                    ) : null} */}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-x-5">
                     <div>
                       <label
                         className={`text-[#697a8d] text-sm mb-1 after:content-["*"] after:text-red-600 after:ml-1 `}
@@ -179,114 +330,314 @@ const Indicator = () => {
                       </label>
                       <select
                         className="select select-bordered w-full bg-transparent mb-4 mt-0 focus:outline-none text-[#697a8d] max-h-[2.6rem] min-h-[2.6rem]"
-                        name="jenis_kelamin"
-                        // onChange={formik.handleChange}
+                        name="gender"
+                        onChange={formik.handleChange}
                       >
                         <option disabled selected>
                           Pilih Jenis Kelamin
                         </option>
-                        <option value="Jantan">Jantan</option>
-                        <option value="Betina">Betina</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                       </select>
-                      {/* {formik.touched.status && formik.errors.status ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.status}
-                      </div>
-                    ) : null} */}
                     </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-5">
                     <div>
                       <Input
                         admin
                         label="Dari Umur"
                         placeholder="Masukkan Dari Umur"
-                        name="dari_umur"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        name="from_age"
+                        value={formik.values.from_age}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.from_age && formik.errors.from_age ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.from_age}
+                        </div>
+                      ) : null}
                     </div>
                     <div>
                       <Input
                         admin
                         label="Sampai Umur"
                         placeholder="Masukkan Sampai Umur"
-                        name="sampai_umur"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        name="to_age"
+                        value={formik.values.to_age}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.to_age && formik.errors.to_age ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.to_age}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
-                  {type === "Sapi Potong" ? (
-                    <div className="grid grid-cols-3 gap-x-5">
-                      <div>
-                        <Input
-                          admin
-                          label="Batas Grade 1"
-                          placeholder="Masukkan Batas Grade 1"
-                          name="grade_1"
-                          // value={formik.values.judul}
-                          // onChange={formik.handleChange}
-                          // onBlur={formik.handleBlur}
-                          required
-                        />
-                        {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
-                      </div>
-                      <div>
-                        <Input
-                          admin
-                          label="Batas Grade 2"
-                          placeholder="Masukkan Batas Grade 2"
-                          name="grade_2"
-                          // value={formik.values.judul}
-                          // onChange={formik.handleChange}
-                          // onBlur={formik.handleBlur}
-                          required
-                        />
-                        {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
-                      </div>
-                      <div>
-                        <Input
-                          admin
-                          label="Batas Grade 3"
-                          placeholder="Masukkan Batas Grade 3"
-                          name="grade_3"
-                          // value={formik.values.judul}
-                          // onChange={formik.handleChange}
-                          // onBlur={formik.handleBlur}
-                          required
-                        />
-                        {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
-                      </div>
+                  <div className="grid grid-cols-3 gap-x-5">
+                    <div>
+                      <Input
+                        admin
+                        label="Grade 1"
+                        placeholder="Masukkan Grade 1"
+                        name="limit_grade_1"
+                        value={formik.values.limit_grade_1}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                      />
+                      {formik.touched.limit_grade_1 &&
+                      formik.errors.limit_grade_1 ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.limit_grade_1}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
+                    <div>
+                      <Input
+                        admin
+                        label="Grade 2"
+                        placeholder="Masukkan Grade 2"
+                        name="limit_grade_2"
+                        value={formik.values.limit_grade_2}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                      />
+                      {formik.touched.limit_grade_2 &&
+                      formik.errors.limit_grade_2 ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.limit_grade_2}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <Input
+                        admin
+                        label="Grade 3"
+                        placeholder="Masukkan Grade 3"
+                        name="limit_grade_3"
+                        value={formik.values.limit_grade_3}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                      />
+                      {formik.touched.limit_grade_3 &&
+                      formik.errors.limit_grade_3 ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.limit_grade_3}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
                   <div className="py-2">
                     <Button
                       label="Tambah Data"
+                      className="w-full mt-4"
+                      type="submit"
+                    />
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </Popup>
+      )}
+      {edit && (
+        <Popup
+          onConfirm={() => {
+            setEdit(false);
+          }}
+        >
+          <div className="relative w-[60vw] max-h-full">
+            <div className="relative w-full bg-white rounded-lg shadow">
+              <div className="px-6 py-6 lg:px-8">
+                <div className="mb-4 text-xl text-center font-bold text-black">
+                  Edit Indikator
+                </div>
+                <form onSubmit={editFormik.handleSubmit}>
+                  <div className=" grid grid-cols-2 gap-x-5">
+                    <div>
+                      <label
+                        className={`text-[#697a8d] text-sm mb-1 after:content-["*"] after:text-red-600 after:ml-1 `}
+                      >
+                        Jenis Ternak
+                      </label>
+                      <select
+                        className="select select-bordered w-full bg-transparent mb-4 mt-0 focus:outline-none text-[#697a8d] max-h-[2.6rem] min-h-[2.6rem]"
+                        name="type_livestock_id"
+                        onChange={editFormik.handleChange}
+                      >
+                        <option disabled selected>
+                          Pilih Jenis Ternak
+                        </option>
+                        {livestock_type?.map((item, index) => {
+                          return (
+                            <option
+                              value={item?.id}
+                              selected={item?.id == dataEdit?.type_livestock_id}
+                            >
+                              {item?.type?.toLocaleUpperCase()}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+                    <div>
+                      <Input
+                        admin
+                        label="Indikator"
+                        placeholder="Masukkan Indikator"
+                        name="indicator"
+                        value={editFormik.values.indicator}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.indicator &&
+                      editFormik.errors.indicator ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.indicator}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-5">
+                    <div>
+                      <Input
+                        admin
+                        label="Satuan"
+                        placeholder="Masukkan Satuan"
+                        name="unit"
+                        value={editFormik.values.unit}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.unit && editFormik.errors.unit ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.unit}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <label
+                        className={`text-[#697a8d] text-sm mb-1 after:content-["*"] after:text-red-600 after:ml-1 `}
+                      >
+                        Jenis Kelamin
+                      </label>
+                      <select
+                        className="select select-bordered w-full bg-transparent mb-4 mt-0 focus:outline-none text-[#697a8d] max-h-[2.6rem] min-h-[2.6rem]"
+                        name="gender"
+                        onChange={editFormik.handleChange}
+                      >
+                        <option disabled selected>
+                          Pilih Jenis Kelamin
+                        </option>
+                        <option value="Male" selected={dataEdit?.gender === 'Male'}>Male</option>
+                        <option value="Female" selected={dataEdit?.gender === 'Female'}>Female</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-5">
+                    <div>
+                      <Input
+                        admin
+                        label="Dari Umur"
+                        placeholder="Masukkan Dari Umur"
+                        name="from_age"
+                        value={editFormik.values.from_age}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.from_age &&
+                      editFormik.errors.from_age ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.from_age}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <Input
+                        admin
+                        label="Sampai Umur"
+                        placeholder="Masukkan Sampai Umur"
+                        name="to_age"
+                        value={editFormik.values.to_age}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.to_age && editFormik.errors.to_age ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.to_age}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-x-5">
+                    <div>
+                      <Input
+                        admin
+                        label="Grade 1"
+                        placeholder="Masukkan Grade 1"
+                        name="limit_grade_1"
+                        value={editFormik.values.limit_grade_1}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.limit_grade_1 &&
+                      editFormik.errors.limit_grade_1 ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.limit_grade_1}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <Input
+                        admin
+                        label="Grade 2"
+                        placeholder="Masukkan Grade 2"
+                        name="limit_grade_2"
+                        value={editFormik.values.limit_grade_2}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.limit_grade_2 &&
+                      editFormik.errors.limit_grade_2 ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.limit_grade_2}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <Input
+                        admin
+                        label="Grade 3"
+                        placeholder="Masukkan Grade 3"
+                        name="limit_grade_3"
+                        value={editFormik.values.limit_grade_3}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.limit_grade_3 &&
+                      editFormik.errors.limit_grade_3 ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.limit_grade_3}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="py-2">
+                    <Button
+                      label="Edit Data"
                       className="w-full mt-4"
                       type="submit"
                     />

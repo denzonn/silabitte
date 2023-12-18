@@ -27,3 +27,15 @@ export const validateType = yup.object({
   type: yup.string().required("Anda Harus Memasukkan Type"),
   certificate_color: yup.string().required("Anda Harus Memasukkan Warna Sertifikat"),
 });
+
+export const validateIndicator = yup.object({
+  indicator: yup.string().required("Anda Harus Memasukkan Indikator"),
+  unit: yup.string().required("Anda Harus Memasukkan Unit"),
+  gender: yup.string().required("Anda Harus Memasukkan Gender"),
+  from_age: yup.string().required("Anda Harus Memasukkan From-Age"),
+  to_age: yup.string().required("Anda Harus Memasukkan To-Age"),
+  limit_grade_1: yup.string().required("Anda Harus Memasukkan Limitgrade 1"),
+  limit_grade_2: yup.string().required("Anda Harus Memasukkan Limitgrade 2"),
+  limit_grade_3: yup.string().required("Anda Harus Memasukkan Limitgrade 3"),
+  type_livestock_id: yup.string().required("Anda Harus Memasukkan Tipe Ternak"),
+});
