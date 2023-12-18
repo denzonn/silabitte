@@ -3,60 +3,113 @@ import Breadcrumb from "../../component/Breadcrumb";
 import Button from "../../component/Button";
 import Popup from "../../component/Popup";
 import Sidebar from "../../component/Sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "../../component/Input";
+import axios from "axios";
+import toast from "react-hot-toast";
+import Cookie from "js-cookie";
+import { validateUser } from "../../validation/auth";
+import { useNavigate } from "react-router-dom";
+
+interface UserProps {
+  name?: string;
+  email?: string;
+  role?: string;
+  is_active?: string;
+}
 
 const User = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
+  const [data, setData] = useState<UserProps>();
+  const token = Cookie.get("token");
+  const [id, setId] = useState<number>(0);
+
+  const navigate = useNavigate();
+
   const [add, setAdd] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
 
-  // const formik = useFormik({
-  //   initialValues: {
-  //     judul: "",
-  //     file: null,
-  //   },
-  //   validationSchema: validateDokument,
-  //   onSubmit: (values) => {
-  //     const formData = new FormData();
-  //     formData.append("judul", values.judul);
-  //     formData.append("file", values.file);
+  const getData = () => {
+    axios
+      .get("/api/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setData(res?.data?.data?.data);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
+  };
 
-  //     axios
-  //       .post("dokument", formData, {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       })
-  //       .then(() => {
-  //         toast.success("Berhasil Menambahkan Dokument");
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "",
+    },
+    validationSchema: validateUser,
+    onSubmit: (values) => {
+      axios
+        .post("/api/user", values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          toast.success("Berhasil Menambahkan User");
 
-  //         setAdd(false);
-  //         getData();
-  //         formik.resetForm();
-  //       })
-  //       .catch((err) => {
-  //         if (err.response && err.response.data && err.response.data.message) {
-  //           toast.error(err.response.data.message);
-  //         } else if (
-  //           err.response &&
-  //           err.response.data &&
-  //           err.response.data.errors
-  //         ) {
-  //           const errorMessages = Object.values(
-  //             err.response.data.errors
-  //           ).flat();
-  //           toast.error(errorMessages.join("\n"));
-  //         } else {
-  //           // If the error doesn't have the expected structure, display a generic error message
-  //           toast.error("An error occurred. Please try again.");
-  //         }
-  //       });
-  //   },
-  // });
+          setAdd(false);
+          getData();
+          formik.resetForm();
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
+    },
+  });
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getDestroy = (id: string) => {
+    toast.promise(
+      axios
+        .delete(`/api/user/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          getData();
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        }),
+      {
+        loading: "Menghapus...",
+        success: "Berhasil Menghapus User...",
+        error: (error) => {
+          toast.error(error.message);
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (!token) {
+      setTimeout(() => {
+        toast.error("Silahkan login terlebih dahulu");
+      }, 2000);
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   return (
     <section>
@@ -92,17 +145,28 @@ const User = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                <tr className="border-b-gray-200">
-                  <td>1</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>
-                    <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
-                    <i className="fa-solid fa-trash cursor-pointer ml-2"></i>
-                  </td>
-                </tr>
+                {data?.length > 0 ? (
+                  data?.map((item: UserProps, index: number) => {
+                    return (
+                      <tr className="border-b-gray-200" key={index}>
+                        <td>{index + 1}</td>
+                        <td>{item?.name}</td>
+                        <td>{item?.email}</td>
+                        <td>{item?.role}</td>
+                        <td>{item?.is_active === '1' ? 'Aktif' : 'Non Aktif'}</td>
+                        <td>
+                          <i className="fa-solid fa-trash cursor-pointer ml-2" onClick={() => getDestroy(item?.id)}></i>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr className="border-b-gray-200">
+                    <td colSpan={6} className="text-center">
+                      Tidak ada User
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -120,9 +184,7 @@ const User = () => {
                 <div className="mb-4 text-xl text-center font-bold text-black">
                   Tambahkan User
                 </div>
-                <form
-                // onSubmit={formik.handleSubmit}
-                >
+                <form onSubmit={formik.handleSubmit}>
                   <div className=" grid grid-cols-2 gap-x-5">
                     <div>
                       <Input
@@ -130,16 +192,16 @@ const User = () => {
                         label="Name"
                         placeholder="Masukkan Name"
                         name="name"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.name && formik.errors.name ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.name}
+                        </div>
+                      ) : null}
                     </div>
                     <div>
                       <Input
@@ -148,16 +210,16 @@ const User = () => {
                         type="Email"
                         placeholder="Masukkan Email"
                         name="email"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.email && formik.errors.email ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.email}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-x-5">
@@ -168,16 +230,16 @@ const User = () => {
                         type="password"
                         placeholder="Masukkan Password"
                         name="password"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.password && formik.errors.password ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.password}
+                        </div>
+                      ) : null}
                     </div>
                     <div>
                       <label
@@ -188,23 +250,23 @@ const User = () => {
                       <select
                         className="select select-bordered w-full bg-transparent mb-4 mt-0 focus:outline-none text-[#697a8d] max-h-[2.6rem] min-h-[2.6rem]"
                         name="role"
-                        // onChange={formik.handleChange}
+                        onChange={formik.handleChange}
                       >
                         <option disabled selected>
                           Pilih Role
                         </option>
+                        <option value="Applicant">Applicant</option>
+                        <option value="Verifier 1">Verifier 1</option>
+                        <option value="Official">Official</option>
+                        <option value="Verifier 2">Verifier 2</option>
+                        <option value="Leader">Leader</option>
                         <option value="Admin">Admin</option>
-                        <option value="Pemohon">Pemohon</option>
-                        <option value="Verifikator 1">Verifikator 1</option>
-                        <option value="Verifikator 2">Verifikator 2</option>
-                        <option value="Petugas">Petugas</option>
-                        <option value="Pimpinan">Pimpinan</option>
                       </select>
-                      {/* {formik.touched.status && formik.errors.status ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.status}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.role && formik.errors.role ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.role}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                   <div className="py-2">

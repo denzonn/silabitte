@@ -5,8 +5,11 @@ import Type from "./pages/type";
 import Result from "./pages/result";
 import Indicator from "./pages/indicator";
 import Request from "./pages/request";
+import axios from "axios";
 
 const App = () => {
+  axios.defaults.baseURL = "https://silabitte.elayanan.info";
+
   return (
     <BrowserRouter>
       <Routes>
