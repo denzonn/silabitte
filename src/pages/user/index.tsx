@@ -24,12 +24,10 @@ const User = () => {
 
   const [data, setData] = useState<UserProps>();
   const token = Cookie.get("token");
-  const [id, setId] = useState<number>(0);
 
   const navigate = useNavigate();
 
   const [add, setAdd] = useState<boolean>(false);
-  const [edit, setEdit] = useState<boolean>(false);
 
   const getData = () => {
     axios

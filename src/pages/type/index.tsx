@@ -1,16 +1,156 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Breadcrumb from "../../component/Breadcrumb";
 import Button from "../../component/Button";
 import Input from "../../component/Input";
 import Popup from "../../component/Popup";
 import Sidebar from "../../component/Sidebar";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Cookie from "js-cookie";
+import toast from "react-hot-toast";
+import { useFormik } from "formik";
+import { validateType } from "../../validation/auth";
+
+interface TypeProps {
+  type?: string;
+  certificate_color?: string;
+}
 
 const Type = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
+  const [data, setData] = useState<TypeProps>();
+  const token = Cookie.get("token");
+  const [id, setId] = useState<number>(0);
+
+  const navigate = useNavigate();
+
   const [add, setAdd] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
+
+  const getData = () => {
+    axios
+      .get("/api/type-livestock", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setData(res?.data?.data?.data);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
+  };
+
+  const handleChangeCertificateColor = (event) => {
+    formik.setFieldValue("certificate_color", event.target.value);
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      type: "",
+      certificate_color: "",
+    },
+    validationSchema: validateType,
+    onSubmit: (values) => {
+      axios
+        .post("/api/type-livestock", values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          toast.success("Berhasil Menambahkan Tipe Ternak");
+          setAdd(false);
+          getData();
+          formik.resetForm();
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
+    },
+  });
+  
+  const getEditData = (id: string) => {
+    axios
+      .get(`/api/type-livestock/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setEdit(!edit);
+        setId(res?.data?.data?.id);
+        initializeFormik(res?.data?.data);
+      });
+  };
+
+  const initializeFormik = (data: any) => {
+    editFormik.setValues({
+      type: data?.type || "",
+      certificate_color: data?.certificate_color || "",
+    });
+  };
+
+
+  const handleEditChangeCertificateColor = (event) => {
+    editFormik.setFieldValue("certificate_color", event.target.value);
+  };
+
+  const editFormik = useFormik({
+    initialValues: {
+      type: "",
+      certificate_color: "",
+    },
+    validationSchema: validateType,
+    onSubmit: (values) => {
+      axios
+        .put(`/api/type-livestock/${id}`, values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          toast.success("Berhasil Mengupdate Tipe Ternak");
+          setEdit(false);
+          getData();
+          editFormik.resetForm();
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
+    },
+  });
+
+  const getDestroy = (id: string) => {
+    toast.promise(
+      axios
+        .delete(`/api/type-livestock/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          getData();
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        }),
+      {
+        loading: "Menghapus...",
+        success: "Berhasil Menghapus Tipe Ternak...",
+        error: (error) => {
+          toast.error(error.message);
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <section>
@@ -44,15 +184,27 @@ const Type = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                <tr className="border-b-gray-200">
-                  <td>1</td>
-                  <td>dasd</td>
-                  <td>dasd</td>
-                  <td>
-                    <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
-                    <i className="fa-solid fa-trash cursor-pointer ml-2"></i>
-                  </td>
-                </tr>
+                {data?.length > 0 ? (
+                  data?.map((item: TypeProps, index: number) => {
+                    return (
+                      <tr className="border-b-gray-200" key={index}>
+                        <td>{index + 1}</td>
+                        <td>{item?.type?.toLocaleUpperCase()}</td>
+                        <td>{item?.certificate_color?.toLocaleUpperCase()}</td>
+                        <td>
+                          <i className="fa-solid fa-pen-to-square cursor-pointer ml-2" onClick={() => getEditData(item?.id)}></i>
+                          <i className="fa-solid fa-trash cursor-pointer ml-2" onClick={() => getDestroy(item?.id)}></i>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr className="border-b-gray-200">
+                    <td colSpan={4} className="text-center">
+                      Tidak ada Jenis Ternak
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -70,26 +222,24 @@ const Type = () => {
                 <div className="mb-4 text-xl text-center font-bold text-black">
                   Tambahkan Jenis Ternak
                 </div>
-                <form
-                // onSubmit={formik.handleSubmit}
-                >
+                <form onSubmit={formik.handleSubmit}>
                   <div className=" grid grid-cols-2 gap-x-5">
                     <div>
                       <Input
                         admin
                         label="Name"
-                        placeholder="Masukkan Name"
-                        name="name"
-                        // value={formik.values.judul}
-                        // onChange={formik.handleChange}
-                        // onBlur={formik.handleBlur}
+                        placeholder="Masukkan Name Tipe Ternak"
+                        name="type"
+                        value={formik.values.type}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         required
                       />
-                      {/* {formik.touched.judul && formik.errors.judul ? (
-                      <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
-                        {formik.errors.judul}
-                      </div>
-                    ) : null} */}
+                      {formik.touched.type && formik.errors.type ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.type}
+                        </div>
+                      ) : null}
                     </div>
                     <div>
                       <label className={`text-[#697a8d] text-sm mb-1`}>
@@ -99,9 +249,13 @@ const Type = () => {
                         <div className="flex flex-col items-center">
                           <input
                             type="radio"
-                            name="radio-1"
+                            name="certificate_color"
+                            value="Biru Muda"
                             className="radio h-5 w-5 checked:bg-[#82b7f4] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
-                            checked
+                            checked={
+                              formik.values.certificate_color === "Biru Muda"
+                            }
+                            onChange={handleChangeCertificateColor}
                           />
                           <label className={`text-[#697a8d] text-xs mb-1`}>
                             Biru Muda
@@ -110,8 +264,13 @@ const Type = () => {
                         <div className="flex flex-col items-center">
                           <input
                             type="radio"
-                            name="radio-1"
+                            name="certificate_color"
+                            value="Krem"
                             className="radio h-5 w-5 checked:bg-[#fffdd0] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
+                            checked={
+                              formik.values.certificate_color === "Krem"
+                            }
+                            onChange={handleChangeCertificateColor}
                           />
                           <label className={`text-[#697a8d] text-xs mb-1`}>
                             Krem
@@ -120,8 +279,13 @@ const Type = () => {
                         <div className="flex flex-col items-center">
                           <input
                             type="radio"
-                            name="radio-1"
+                            name="certificate_color"
+                            value="Hijau Muda"
                             className="radio h-5 w-5 checked:bg-[#68e773] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
+                            checked={
+                              formik.values.certificate_color === "Hijau Muda"
+                            }
+                            onChange={handleChangeCertificateColor}
                           />
                           <label className={`text-[#697a8d] text-xs mb-1`}>
                             Hijau Muda
@@ -130,8 +294,125 @@ const Type = () => {
                         <div className="flex flex-col items-center">
                           <input
                             type="radio"
-                            name="radio-1"
+                            name="certificate_color"
+                            value="Putih"
                             className="radio h-5 w-5 checked:bg-[#ffffff] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
+                            checked={
+                              formik.values.certificate_color === "Putih"
+                            }
+                            onChange={handleChangeCertificateColor}
+                          />
+                          <label className={`text-[#697a8d] text-xs mb-1`}>
+                            Putih
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="py-2">
+                    <Button
+                      label="Tambah Data"
+                      className="w-full mt-4"
+                      type="submit"
+                    />
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </Popup>
+      )}
+      {edit && (
+        <Popup
+          onConfirm={() => {
+            setEdit(false);
+          }}
+        >
+          <div className="relative w-[60vw] max-h-full">
+            <div className="relative w-full bg-white rounded-lg shadow">
+              <div className="px-6 py-6 lg:px-8">
+                <div className="mb-4 text-xl text-center font-bold text-black">
+                  Edit Jenis Ternak
+                </div>
+                <form onSubmit={editFormik.handleSubmit}>
+                  <div className=" grid grid-cols-2 gap-x-5">
+                    <div>
+                      <Input
+                        admin
+                        label="Name"
+                        placeholder="Masukkan Name Tipe Ternak"
+                        name="type"
+                        value={editFormik.values.type}
+                        onChange={editFormik.handleChange}
+                        onBlur={editFormik.handleBlur}
+                        required
+                      />
+                      {editFormik.touched.type && editFormik.errors.type ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {editFormik.errors.type}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <label className={`text-[#697a8d] text-sm mb-1`}>
+                        Warna Sertifikat
+                      </label>
+                      <div className="flex flex-row gap-x-5 mt-2">
+                        <div className="flex flex-col items-center">
+                          <input
+                            type="radio"
+                            name="certificate_color"
+                            value="Biru Muda"
+                            className="radio h-5 w-5 checked:bg-[#82b7f4] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
+                            checked={
+                              editFormik.values.certificate_color === "Biru Muda"
+                            }
+                            onChange={handleEditChangeCertificateColor}
+                          />
+                          <label className={`text-[#697a8d] text-xs mb-1`}>
+                            Biru Muda
+                          </label>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <input
+                            type="radio"
+                            name="certificate_color"
+                            value="Krem"
+                            className="radio h-5 w-5 checked:bg-[#fffdd0] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
+                            checked={
+                              editFormik.values.certificate_color === "Krem"
+                            }
+                            onChange={handleEditChangeCertificateColor}
+                          />
+                          <label className={`text-[#697a8d] text-xs mb-1`}>
+                            Krem
+                          </label>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <input
+                            type="radio"
+                            name="certificate_color"
+                            value="Hijau Muda"
+                            className="radio h-5 w-5 checked:bg-[#68e773] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
+                            checked={
+                              editFormik.values.certificate_color === "Hijau Muda"
+                            }
+                            onChange={handleEditChangeCertificateColor}
+                          />
+                          <label className={`text-[#697a8d] text-xs mb-1`}>
+                            Hijau Muda
+                          </label>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <input
+                            type="radio"
+                            name="certificate_color"
+                            value="Putih"
+                            className="radio h-5 w-5 checked:bg-[#ffffff] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
+                            checked={
+                              editFormik.values.certificate_color === "Putih"
+                            }
+                            onChange={handleEditChangeCertificateColor}
                           />
                           <label className={`text-[#697a8d] text-xs mb-1`}>
                             Putih

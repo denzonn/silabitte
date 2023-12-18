@@ -22,3 +22,8 @@ export const validateUser = yup.object({
   password: yup.string().required("Anda Harus Memasukkan Password"),
   name: yup.string().required("Anda Harus Memasukkan Name"),
 });
+
+export const validateType = yup.object({
+  type: yup.string().required("Anda Harus Memasukkan Type"),
+  certificate_color: yup.string().required("Anda Harus Memasukkan Warna Sertifikat"),
+});
