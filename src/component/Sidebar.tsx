@@ -55,6 +55,24 @@ const Sidebar = () => {
                 </span>
               </li>
             </Link>
+            <Link to="/news">
+              <li
+                className={`px-5 w-full py-4 rounded-lg ${
+                  pathname === "/news" ? "bg-[#4abdac2e]" : ""
+                } text-sm flex gap-3 items-center mb-1`}
+              >
+                <i className={`fa-solid fa-newspaper ${pathname === '/news' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
+                <span
+                  className={
+                    pathname === "/news"
+                      ? "text-[#4abdac]"
+                      : "text-[#67748E]"
+                  }
+                >
+                  Berita
+                </span>
+              </li>
+            </Link>
             <Link to="/type">
               <li
                 className={`px-5 w-full py-4 rounded-lg ${

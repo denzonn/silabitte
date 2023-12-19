@@ -39,3 +39,8 @@ export const validateIndicator = yup.object({
   limit_grade_3: yup.string().required("Anda Harus Memasukkan Limitgrade 3"),
   type_livestock_id: yup.string().required("Anda Harus Memasukkan Tipe Ternak"),
 });
+
+export const validateNews = yup.object({
+  title: yup.string().required("Anda Harus Memasukkan Judul Berita"),
+  content: yup.string().required("Anda Harus Memasukkan Isi Berita"),
+});

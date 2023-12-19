@@ -292,7 +292,6 @@ const User = () => {
                         <option disabled selected>
                           Pilih Role
                         </option>
-                        <option value="Applicant">Applicant</option>
                         <option value="Verifier 1">Verifier 1</option>
                         <option value="Official">Official</option>
                         <option value="Verifier 2">Verifier 2</option>

@@ -5,6 +5,7 @@ import Type from "./pages/type";
 import Result from "./pages/result";
 import Indicator from "./pages/indicator";
 import Request from "./pages/request";
+import News from "./pages/news";
 import axios from "axios";
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <Route element={<Result/>} path="/result"/>
         <Route element={<Indicator/>} path="/indicator"/>
         <Route element={<Request/>} path="/request"/>
+        <Route element={<News/>} path="/news"/>
       </Routes>
     </BrowserRouter>
   );
