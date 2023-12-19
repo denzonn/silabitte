@@ -9,6 +9,7 @@ import Cookie from "js-cookie";
 import toast from "react-hot-toast";
 import { useFormik } from "formik";
 import { validateIndicator } from "../../validation/auth";
+import { useNavigate } from "react-router-dom";
 
 interface IndicatorProps {
   indicator?: string;
@@ -35,6 +36,8 @@ const Indicator = () => {
   const [edit, setEdit] = useState<boolean>(false);
 
   const [livestock_type, setLivestock_type] = useState<any>();
+
+  const navigate = useNavigate()
   
   const getType = () => {
     axios
@@ -188,6 +191,15 @@ const Indicator = () => {
     getData();
   }, []);
 
+  useEffect(() => {
+    if (!token) {
+      setTimeout(() => {
+        toast.error("Silahkan login terlebih dahulu");
+      }, 2000);
+      navigate("/");
+    }
+  }, [token, navigate]);
+
   return (
     <section>
       <div className="bg-primary w-full h-[40vh] fixed top-0 left-0 z-0"></div>
@@ -240,7 +252,7 @@ const Indicator = () => {
                 ) : (
                   <tr className="border-b-gray-200">
                     <td colSpan={6} className="text-center">
-                      Tidak ada Permohonan
+                      Tidak ada Indikator
                     </td>
                   </tr>
                 )}

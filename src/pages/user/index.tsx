@@ -50,6 +50,9 @@ const User = () => {
       email: "",
       password: "",
       role: "",
+      address: "",
+      phone_number: "",
+      is_active: true
     },
     validationSchema: validateUser,
     onSubmit: (values) => {
@@ -216,6 +219,42 @@ const User = () => {
                       {formik.touched.email && formik.errors.email ? (
                         <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
                           {formik.errors.email}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className=" grid grid-cols-2 gap-x-5">
+                    <div>
+                      <Input
+                        admin
+                        label="Alamat"
+                        placeholder="Masukkan Alamat"
+                        name="address"
+                        value={formik.values.address}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                      />
+                      {formik.touched.address && formik.errors.address ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.address}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <Input
+                        admin
+                        label="No HP"
+                        placeholder="Masukkan No HP"
+                        name="phone_number"
+                        value={formik.values.phone_number}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                      />
+                      {formik.touched.phone_number && formik.errors.phone_number ? (
+                        <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
+                          {formik.errors.phone_number}
                         </div>
                       ) : null}
                     </div>

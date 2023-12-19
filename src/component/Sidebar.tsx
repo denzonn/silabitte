@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import Cookie from 'js-cookie'
 
 const Sidebar = () => {
   const pathname = location.pathname;
@@ -17,7 +18,7 @@ const Sidebar = () => {
         </div>
         <hr className="my-3" />
         <div className="flex flex-col justify-between h-full ">
-          <ul className="w-full overflow-auto max-h-96 slides relative pl-0">
+          <ul className="w-full overflow-auto slides relative pl-0">
             <Link to="/dashboard">
               <li
                 className={`px-5 w-full py-4 rounded-lg ${
@@ -123,6 +124,24 @@ const Sidebar = () => {
                   }
                 >
                   Hasil Pengukuran
+                </span>
+              </li>
+            </Link>
+            <Link to="/" onClick={() => Cookie.remove("token")}>
+              <li
+                className={`px-5 w-full py-4 rounded-lg ${
+                  pathname === "/result" ? "bg-[#4abdac2e]" : ""
+                } text-sm flex gap-3 items-center mb-1`}
+              >
+                <i className={`fa-solid fa-right-from-bracket ${pathname === '/result' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
+                <span
+                  className={
+                    pathname === "/result"
+                      ? "text-[#4abdac]"
+                      : "text-[#67748E]"
+                  }
+                >
+                  Logout
                 </span>
               </li>
             </Link>

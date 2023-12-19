@@ -57,6 +57,15 @@ const Request = () => {
     getData()
   }, [])
 
+  useEffect(() => {
+    if (!token) {
+      setTimeout(() => {
+        toast.error("Silahkan login terlebih dahulu");
+      }, 2000);
+      navigate("/");
+    }
+  }, [token, navigate]);
+
   return (
     <section>
       <div className="bg-primary w-full h-[40vh] fixed top-0 left-0 z-0"></div>

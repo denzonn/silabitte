@@ -199,7 +199,9 @@ const Type = () => {
                       <tr className="border-b-gray-200" key={index}>
                         <td>{index + 1}</td>
                         <td>{item?.type?.toLocaleUpperCase()}</td>
-                        <td>{item?.certificate_color?.toLocaleUpperCase()}</td>
+                        <td>
+                          <div className={`w-6 h-6 bg-[${item?.certificate_color}] rounded-full`}></div>
+                        </td>
                         <td>
                           <i className="fa-solid fa-pen-to-square cursor-pointer ml-2" onClick={() => getEditData(item?.id)}></i>
                           <i className="fa-solid fa-trash cursor-pointer ml-2" onClick={() => getDestroy(item?.id)}></i>
@@ -259,10 +261,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Biru Muda"
+                            value="#82b7f4"
                             className="radio h-5 w-5 checked:bg-[#82b7f4] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              formik.values.certificate_color === "Biru Muda"
+                              formik.values.certificate_color === "#82b7f4"
                             }
                             onChange={handleChangeCertificateColor}
                           />
@@ -274,10 +276,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Krem"
+                            value="#fffdd0"
                             className="radio h-5 w-5 checked:bg-[#fffdd0] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              formik.values.certificate_color === "Krem"
+                              formik.values.certificate_color === "#fffdd0"
                             }
                             onChange={handleChangeCertificateColor}
                           />
@@ -289,10 +291,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Hijau Muda"
+                            value="#68e773"
                             className="radio h-5 w-5 checked:bg-[#68e773] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              formik.values.certificate_color === "Hijau Muda"
+                              formik.values.certificate_color === "#68e773"
                             }
                             onChange={handleChangeCertificateColor}
                           />
@@ -304,10 +306,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Putih"
+                            value="#ffffff"
                             className="radio h-5 w-5 checked:bg-[#ffffff] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              formik.values.certificate_color === "Putih"
+                              formik.values.certificate_color === "#ffffff"
                             }
                             onChange={handleChangeCertificateColor}
                           />
@@ -371,10 +373,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Biru Muda"
+                            value="#82b7f4"
                             className="radio h-5 w-5 checked:bg-[#82b7f4] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              editFormik.values.certificate_color === "Biru Muda"
+                              editFormik.values.certificate_color === "#82b7f4"
                             }
                             onChange={handleEditChangeCertificateColor}
                           />
@@ -386,10 +388,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Krem"
+                            value="#fffdd0"
                             className="radio h-5 w-5 checked:bg-[#fffdd0] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              editFormik.values.certificate_color === "Krem"
+                              editFormik.values.certificate_color === "#fffdd0"
                             }
                             onChange={handleEditChangeCertificateColor}
                           />
@@ -401,10 +403,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Hijau Muda"
+                            value="#68e773"
                             className="radio h-5 w-5 checked:bg-[#68e773] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              editFormik.values.certificate_color === "Hijau Muda"
+                              editFormik.values.certificate_color === "#68e773"
                             }
                             onChange={handleEditChangeCertificateColor}
                           />
@@ -416,10 +418,10 @@ const Type = () => {
                           <input
                             type="radio"
                             name="certificate_color"
-                            value="Putih"
+                            value="#ffffff"
                             className="radio h-5 w-5 checked:bg-[#ffffff] checked:shadow-none shadow-none checked:border-none border-[#dee3e8]"
                             checked={
-                              editFormik.values.certificate_color === "Putih"
+                              editFormik.values.certificate_color === "#ffffff"
                             }
                             onChange={handleEditChangeCertificateColor}
                           />
