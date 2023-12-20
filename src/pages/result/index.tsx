@@ -2,7 +2,7 @@ import axios from "axios";
 import Breadcrumb from "../../component/Breadcrumb";
 import Button from "../../component/Button";
 import Sidebar from "../../component/Sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Cookie from 'js-cookie'
@@ -13,6 +13,7 @@ const Result = () => {
 
   const [data, setData] = useState<TypeProps>();
   const token = Cookie.get("token");
+  const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
 
   const navigate = useNavigate();
@@ -42,7 +43,11 @@ const Result = () => {
       }, 2000);
       navigate("/");
     }
-  }, [token, navigate]);
+
+    if (role !== 'admin') {
+      navigate("/dashboard");
+    }
+  }, [token, navigate, role]);
 
   return (
     <section>

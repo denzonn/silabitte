@@ -27,6 +27,7 @@ const Login = () => {
         })
         .then((res) => {
           Cookie.set("token", res?.data?.data?.token);
+          Cookie.set("role", res?.data?.data?.role);
 
           toast.success("Berhasil Login");
           setTimeout(() => {
@@ -82,7 +83,7 @@ const Login = () => {
               </div>
             ) : null}
           </div>
-          <Button label="Login" className="mt-5" type="submit"/>
+          <Button label="Login" className="mt-5 w-full" type="submit" />
         </form>
       </div>
       <div className="w-64 h-64 rounded-3xl absolute top-[20vh] left-4 bg-[#98fdee] rotate-45 -translate-x-16"></div>

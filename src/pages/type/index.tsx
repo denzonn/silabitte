@@ -22,6 +22,7 @@ const Type = () => {
 
   const [data, setData] = useState<TypeProps>();
   const token = Cookie.get("token");
+  const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
 
   const navigate = useNavigate();
@@ -159,7 +160,11 @@ const Type = () => {
       }, 2000);
       navigate("/");
     }
-  }, [token, navigate]);
+
+    if (role !== 'admin') {
+      navigate("/dashboard");
+    }
+  }, [token, navigate, role]);
 
   return (
     <section>

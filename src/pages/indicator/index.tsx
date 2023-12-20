@@ -29,6 +29,7 @@ const Indicator = () => {
 
   const [data, setData] = useState<IndicatorProps>();
   const token = Cookie.get("token");
+  const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
   const [dataEdit, setDataEdit] = useState<IndicatorProps>();
 
@@ -198,7 +199,11 @@ const Indicator = () => {
       }, 2000);
       navigate("/");
     }
-  }, [token, navigate]);
+
+    if (role !== 'admin') {
+      navigate("/dashboard");
+    }
+  }, [token, navigate, role]);
 
   return (
     <section>

@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Cookie from 'js-cookie'
+import Cookie from "js-cookie";
 
 const Sidebar = () => {
   const pathname = location.pathname;
+  const role = Cookie.get("role");
 
   return (
     <div
@@ -25,7 +26,13 @@ const Sidebar = () => {
                   pathname === "/dashboard" ? "bg-[#4abdac2e]" : ""
                 } text-sm flex gap-3 items-center mb-1`}
               >
-                <i className={`fa-solid fa-house ${pathname === '/dashboard' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
+                <i
+                  className={`fa-solid fa-house ${
+                    pathname === "/dashboard"
+                      ? "text-[#4abdac]"
+                      : "text-[#67748E]"
+                  }`}
+                ></i>
                 <span
                   className={
                     pathname === "/dashboard"
@@ -37,85 +44,121 @@ const Sidebar = () => {
                 </span>
               </li>
             </Link>
-            <Link to="/user">
-              <li
-                className={`px-5 w-full py-4 rounded-lg ${
-                  pathname === "/user" ? "bg-[#4abdac2e]" : ""
-                } text-sm flex gap-3 items-center mb-1`}
-              >
-                <i className={`fa-solid fa-user ${pathname === '/user' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
-                <span
-                  className={
-                    pathname === "/user"
-                      ? "text-[#4abdac]"
-                      : "text-[#67748E]"
-                  }
-                >
-                  User
-                </span>
-              </li>
-            </Link>
-            <Link to="/news">
-              <li
-                className={`px-5 w-full py-4 rounded-lg ${
-                  pathname === "/news" ? "bg-[#4abdac2e]" : ""
-                } text-sm flex gap-3 items-center mb-1`}
-              >
-                <i className={`fa-solid fa-newspaper ${pathname === '/news' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
-                <span
-                  className={
-                    pathname === "/news"
-                      ? "text-[#4abdac]"
-                      : "text-[#67748E]"
-                  }
-                >
-                  Berita
-                </span>
-              </li>
-            </Link>
-            <Link to="/type">
-              <li
-                className={`px-5 w-full py-4 rounded-lg ${
-                  pathname === "/type" ? "bg-[#4abdac2e]" : ""
-                } text-sm flex gap-3 items-center mb-1`}
-              >
-                <i className={`fa-solid fa-clipboard-list ${pathname === '/type' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
-                <span
-                  className={
-                    pathname === "/type"
-                      ? "text-[#4abdac]"
-                      : "text-[#67748E]"
-                  }
-                >
-                  Jenis Ternak
-                </span>
-              </li>
-            </Link>
-            <Link to="/indicator">
-              <li
-                className={`px-5 w-full py-4 rounded-lg ${
-                  pathname === "/indicator" ? "bg-[#4abdac2e]" : ""
-                } text-sm flex gap-3 items-center mb-1`}
-              >
-                <i className={`fa-solid fa-star ${pathname === '/indicator' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
-                <span
-                  className={
-                    pathname === "/indicator"
-                      ? "text-[#4abdac]"
-                      : "text-[#67748E]"
-                  }
-                >
-                  Indikator
-                </span>
-              </li>
-            </Link>
+            {role !== "admin" ? (
+              ""
+            ) : (
+              <div>
+                <Link to="/user">
+                  <li
+                    className={`px-5 w-full py-4 rounded-lg ${
+                      pathname === "/user" ? "bg-[#4abdac2e]" : ""
+                    } text-sm flex gap-3 items-center mb-1`}
+                  >
+                    <i
+                      className={`fa-solid fa-user ${
+                        pathname === "/user"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }`}
+                    ></i>
+                    <span
+                      className={
+                        pathname === "/user"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }
+                    >
+                      User
+                    </span>
+                  </li>
+                </Link>
+                <Link to="/news">
+                  <li
+                    className={`px-5 w-full py-4 rounded-lg ${
+                      pathname === "/news" ? "bg-[#4abdac2e]" : ""
+                    } text-sm flex gap-3 items-center mb-1`}
+                  >
+                    <i
+                      className={`fa-solid fa-newspaper ${
+                        pathname === "/news"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }`}
+                    ></i>
+                    <span
+                      className={
+                        pathname === "/news"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }
+                    >
+                      Berita
+                    </span>
+                  </li>
+                </Link>
+                <Link to="/type">
+                  <li
+                    className={`px-5 w-full py-4 rounded-lg ${
+                      pathname === "/type" ? "bg-[#4abdac2e]" : ""
+                    } text-sm flex gap-3 items-center mb-1`}
+                  >
+                    <i
+                      className={`fa-solid fa-clipboard-list ${
+                        pathname === "/type"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }`}
+                    ></i>
+                    <span
+                      className={
+                        pathname === "/type"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }
+                    >
+                      Jenis Ternak
+                    </span>
+                  </li>
+                </Link>
+                <Link to="/indicator">
+                  <li
+                    className={`px-5 w-full py-4 rounded-lg ${
+                      pathname === "/indicator" ? "bg-[#4abdac2e]" : ""
+                    } text-sm flex gap-3 items-center mb-1`}
+                  >
+                    <i
+                      className={`fa-solid fa-star ${
+                        pathname === "/indicator"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }`}
+                    ></i>
+                    <span
+                      className={
+                        pathname === "/indicator"
+                          ? "text-[#4abdac]"
+                          : "text-[#67748E]"
+                      }
+                    >
+                      Indikator
+                    </span>
+                  </li>
+                </Link>
+              </div>
+            )}
             <Link to="/request">
               <li
                 className={`px-5 w-full py-4 rounded-lg ${
                   pathname === "/request" ? "bg-[#4abdac2e]" : ""
                 } text-sm flex gap-3 items-center mb-1`}
               >
-                <i className={`fa-solid fa-person-circle-question ${pathname === '/request' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
+                <i
+                  className={`fa-solid fa-person-circle-question ${
+                    pathname === "/request"
+                      ? "text-[#4abdac]"
+                      : "text-[#67748E]"
+                  }`}
+                ></i>
                 <span
                   className={
                     pathname === "/request"
@@ -127,36 +170,48 @@ const Sidebar = () => {
                 </span>
               </li>
             </Link>
-            <Link to="/result">
-              <li
-                className={`px-5 w-full py-4 rounded-lg ${
-                  pathname === "/result" ? "bg-[#4abdac2e]" : ""
-                } text-sm flex gap-3 items-center mb-1`}
-              >
-                <i className={`fa-solid fa-square-poll-vertical ${pathname === '/result' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
-                <span
-                  className={
-                    pathname === "/result"
-                      ? "text-[#4abdac]"
-                      : "text-[#67748E]"
-                  }
+            {role !== "admin" ? (
+              ""
+            ) : (
+              <Link to="/result">
+                <li
+                  className={`px-5 w-full py-4 rounded-lg ${
+                    pathname === "/result" ? "bg-[#4abdac2e]" : ""
+                  } text-sm flex gap-3 items-center mb-1`}
                 >
-                  Hasil Pengukuran
-                </span>
-              </li>
-            </Link>
-            <Link to="/" onClick={() => Cookie.remove("token")}>
+                  <i
+                    className={`fa-solid fa-square-poll-vertical ${
+                      pathname === "/result"
+                        ? "text-[#4abdac]"
+                        : "text-[#67748E]"
+                    }`}
+                  ></i>
+                  <span
+                    className={
+                      pathname === "/result"
+                        ? "text-[#4abdac]"
+                        : "text-[#67748E]"
+                    }
+                  >
+                    Hasil Pengukuran
+                  </span>
+                </li>
+              </Link>
+            )}
+            <Link to="/" onClick={() => {Cookie.remove("token"), Cookie.remove('role')}}>
               <li
                 className={`px-5 w-full py-4 rounded-lg ${
                   pathname === "/result" ? "bg-[#4abdac2e]" : ""
                 } text-sm flex gap-3 items-center mb-1`}
               >
-                <i className={`fa-solid fa-right-from-bracket ${pathname === '/result' ? 'text-[#4abdac]' : 'text-[#67748E]'}`}></i>
+                <i
+                  className={`fa-solid fa-right-from-bracket ${
+                    pathname === "/result" ? "text-[#4abdac]" : "text-[#67748E]"
+                  }`}
+                ></i>
                 <span
                   className={
-                    pathname === "/result"
-                      ? "text-[#4abdac]"
-                      : "text-[#67748E]"
+                    pathname === "/result" ? "text-[#4abdac]" : "text-[#67748E]"
                   }
                 >
                   Logout

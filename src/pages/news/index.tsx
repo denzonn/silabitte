@@ -13,7 +13,7 @@ import { validateNews } from "../../validation/auth";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-interface TypeProps {
+interface NewsProps {
   title?: string;
   image?: string;
   content?: string;
@@ -23,11 +23,16 @@ const News = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
-  const [data, setData] = useState<TypeProps>();
-  const [editData, setEditData] = useState<TypeProps>();
+  const [data, setData] = useState<NewsProps>();
+  const [editData, setEditData] = useState<NewsProps>();
   const token = Cookie.get("token");
+  const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
+  
   const [showPhoto, setShowPhoto] = useState<boolean>(false);
+  const [searchData, setSearchData] = useState<NewsProps>();
+  const [page, setPage] = useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>();
 
   const navigate = useNavigate();
 
@@ -36,17 +41,30 @@ const News = () => {
 
   const getData = () => {
     axios
-      .get("/api/news", {
+      .get(`/api/news?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
         setData(res?.data?.data?.data);
+        setLastPage(res?.data?.data?.last_page);
       })
       .catch((err) => {
         toast.error(err.message);
       });
+  };
+
+  const nextPage = () => {
+    if (lastPage !== page) {
+      setPage(page + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
   };
 
   const formik = useFormik({
@@ -159,9 +177,43 @@ const News = () => {
     );
   };
 
+  const searchFormik = useFormik({
+    initialValues: {
+      search: "",
+    },
+    onSubmit: (values) => {
+      axios
+        .get(`/api/news?search=${values.search}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          if (res?.data?.data?.data.length > 0) {
+            updateSearchData(res?.data?.data?.data);
+          } else {
+            toast.error("Berita dicari tidak ada !!");
+          }
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
+    },
+  });
+
+  // Update searchData whenever the search input changes
+  useEffect(() => {
+    setSearchData([]);
+  }, [searchFormik.values.search]);
+
+  // Update searchData after fetching results
+  const updateSearchData = (data) => {
+    setSearchData(data);
+  };
+
   useEffect(() => {
     getData();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     if (!token) {
@@ -170,7 +222,11 @@ const News = () => {
       }, 2000);
       navigate("/");
     }
-  }, [token, navigate]);
+
+    if (role !== 'admin') {
+      navigate("/dashboard");
+    }
+  }, [token, navigate, role]);
 
   return (
     <section>
@@ -192,6 +248,24 @@ const News = () => {
                 onClick={() => setAdd(!add)}
               />
             </div>
+            <form onSubmit={searchFormik.handleSubmit}>
+              <div className="flex flex-row gap-x-2">
+                <div className="flex flex-row gap-x-2 items-center justify-center bg-transparent focus:outline-none border border-gray-100 px-6 py-2 rounded-lg font-light text-sm">
+                  <i className="fa-solid fa-magnifying-glass text-gray-400"></i>
+                  <input
+                    type="text"
+                    className="bg-transparent focus:border-none focus:outline-none"
+                    placeholder="Cari Berita"
+                    name="search"
+                    value={searchFormik.values.search}
+                    onChange={searchFormik.handleChange}
+                  />
+                </div>
+                <div>
+                  <Button label="Cari" type="submit" />
+                </div>
+              </div>
+            </form>
           </div>
           <div className="overflow-x-auto px-10 pb-5">
             <table className="table">
@@ -205,8 +279,8 @@ const News = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                {data?.length > 0 ? (
-                  data?.map((item: TypeProps, index: number) => {
+                {searchData?.length > 0 && searchFormik.values.search !== "" ? (
+                  searchData?.map((item: NewsProps, index: number) => {
                     return (
                       <tr className="border-b-gray-200" key={index}>
                         <td>{index + 1}</td>
@@ -214,7 +288,38 @@ const News = () => {
                           <img
                             src={item?.image}
                             alt=""
-                            className="w-40 h-auto object-cover"
+                            className="h-32 object-cover"
+                          />
+                        </td>
+                        <td>{item?.title}</td>
+                        <td>
+                          <div
+                            dangerouslySetInnerHTML={{ __html: item?.content }}
+                          ></div>
+                        </td>
+                        <td>
+                          <i
+                            className="fa-solid fa-pen-to-square cursor-pointer ml-2"
+                            onClick={() => getEditData(item?.id)}
+                          ></i>
+                          <i
+                            className="fa-solid fa-trash cursor-pointer ml-2"
+                            onClick={() => getDestroy(item?.id)}
+                          ></i>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : data && data?.length > 0 ? (
+                  data?.map((item: NewsProps, index: number) => {
+                    return (
+                      <tr className="border-b-gray-200" key={index}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <img
+                            src={item?.image}
+                            alt=""
+                            className="h-32 object-cover"
                           />
                         </td>
                         <td>{item?.title}</td>
@@ -239,12 +344,27 @@ const News = () => {
                 ) : (
                   <tr className="border-b-gray-200">
                     <td colSpan={5} className="text-center">
-                      Tidak ada Berita
+                      {searchFormik.values.search !== ""
+                        ? "Tidak ada Berita yang dicari"
+                        : "Tidak ada Berita"}
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+            <div className="flex flex-row gap-x-3 w-full justify-end">
+              <Button
+                label="Prev"
+                className={`w-28 bg-gray-400 hover:bg-gray-300 ${page === 1 ? "cursor-not-allowed" : ""}`}
+                other
+                onClick={() => prevPage()}
+              />
+              <Button
+                label="Next"
+                className={`w-28 ${page === lastPage ? "cursor-not-allowed" : ""}`}
+                onClick={() => nextPage()}
+              />
+            </div>
           </div>
         </div>
       </main>
@@ -396,9 +516,7 @@ const News = () => {
                           <div className="absolute top-0 left-0 h-full w-full flex justify-center py-10 bg-black bg-opacity-50 z-50">
                             <div className="relative">
                               <img
-                                src={
-                                  editData?.image
-                                }
+                                src={editData?.image}
                                 alt=""
                                 className="h-full rounded-lg border-2 border-white"
                               />

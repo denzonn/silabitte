@@ -29,12 +29,11 @@ const Request = () => {
 
   const [data, setData] = useState<RequestProps>();
   const token = Cookie.get("token");
-  const [id, setId] = useState<number>(0);
+  const role = Cookie.get("role");
 
   const navigate = useNavigate();
 
   const [add, setAdd] = useState<boolean>(false);
-  const [edit, setEdit] = useState<boolean>(false);
 
   const getData = () => {
     axios
@@ -64,7 +63,11 @@ const Request = () => {
       }, 2000);
       navigate("/");
     }
-  }, [token, navigate]);
+
+    if (role !== 'admin') {
+      navigate("/dashboard");
+    }
+  }, [token, navigate, role]);
 
   return (
     <section>

@@ -24,6 +24,7 @@ const User = () => {
 
   const [data, setData] = useState<UserProps>();
   const token = Cookie.get("token");
+  const role = Cookie.get("role");
 
   const navigate = useNavigate();
 
@@ -110,7 +111,11 @@ const User = () => {
       }, 2000);
       navigate("/");
     }
-  }, [token, navigate]);
+
+    if (role !== 'admin') {
+      navigate("/dashboard");
+    }
+  }, [token, navigate, role]);
 
   return (
     <section>
@@ -292,11 +297,10 @@ const User = () => {
                         <option disabled selected>
                           Pilih Role
                         </option>
-                        <option value="Verifier 1">Verifier 1</option>
-                        <option value="Official">Official</option>
-                        <option value="Verifier 2">Verifier 2</option>
-                        <option value="Leader">Leader</option>
-                        <option value="Admin">Admin</option>
+                        <option value="verifier I">Verifikator 1</option>
+                        <option value="official">Tim Penilai</option>
+                        <option value="verifier II">Verifikator 2</option>
+                        <option value="leader">Pimpinan</option>
                       </select>
                       {formik.touched.role && formik.errors.role ? (
                         <div className="text-red-500 focus:outline-red-500 text-sm font-medium pb-2">
