@@ -28,6 +28,11 @@ export const validateType = yup.object({
   certificate_color: yup.string().required("Anda Harus Memasukkan Warna Sertifikat"),
 });
 
+export const validateRequest = yup.object({
+  type: yup.string().required("Anda Harus Memasukkan Type"),
+  certificate_color: yup.string().required("Anda Harus Memasukkan Warna Sertifikat"),
+});
+
 export const validateIndicator = yup.object({
   indicator: yup.string().required("Anda Harus Memasukkan Indikator"),
   unit: yup.string().required("Anda Harus Memasukkan Unit"),

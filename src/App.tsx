@@ -7,6 +7,7 @@ import Indicator from "./pages/indicator";
 import Request from "./pages/request";
 import News from "./pages/news";
 import axios from "axios";
+import Dashboard from "./pages/dashboard";
 
 const App = () => {
   axios.defaults.baseURL = "https://silabitte.elayanan.info";
@@ -15,6 +16,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<Login/>} path="/"/>
+        <Route element={<Dashboard/>} path="/dashboard"/>
         <Route element={<User/>} path="/user"/>
         <Route element={<Type/>} path="/type"/>
         <Route element={<Result/>} path="/result"/>

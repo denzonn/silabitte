@@ -201,17 +201,17 @@ const Sidebar = () => {
             <Link to="/" onClick={() => {Cookie.remove("token"), Cookie.remove('role')}}>
               <li
                 className={`px-5 w-full py-4 rounded-lg ${
-                  pathname === "/result" ? "bg-[#4abdac2e]" : ""
+                  pathname === "/" ? "bg-[#4abdac2e]" : ""
                 } text-sm flex gap-3 items-center mb-1`}
               >
                 <i
                   className={`fa-solid fa-right-from-bracket ${
-                    pathname === "/result" ? "text-[#4abdac]" : "text-[#67748E]"
+                    pathname === "/" ? "text-[#4abdac]" : "text-[#67748E]"
                   }`}
                 ></i>
                 <span
                   className={
-                    pathname === "/result" ? "text-[#4abdac]" : "text-[#67748E]"
+                    pathname === "/" ? "text-[#4abdac]" : "text-[#67748E]"
                   }
                 >
                   Logout

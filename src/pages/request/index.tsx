@@ -33,8 +33,6 @@ const Request = () => {
 
   const navigate = useNavigate();
 
-  const [add, setAdd] = useState<boolean>(false);
-
   const getData = () => {
     axios
       .get("/api/request", {
@@ -63,11 +61,7 @@ const Request = () => {
       }, 2000);
       navigate("/");
     }
-
-    if (role !== 'admin') {
-      navigate("/dashboard");
-    }
-  }, [token, navigate, role]);
+  }, [token, navigate]);
 
   return (
     <section>
@@ -80,15 +74,6 @@ const Request = () => {
         <div className="bg-white rounded-2xl">
           <div className="px-10 mt-5 pt-5 text-[#344767] font-semibold">
             Data Permohonan Table
-          </div>
-          <div className="flex flex-row justify-between px-10 my-3">
-            <div>
-              <Button
-                label="Tambah Permohonan"
-                className="text-sm"
-                onClick={() => setAdd(!add)}
-              />
-            </div>
           </div>
           <div className="overflow-x-auto px-10 pb-5">
             <table className="table">
