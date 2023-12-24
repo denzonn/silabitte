@@ -1,33 +1,55 @@
 import { useEffect, useState } from "react";
 import Breadcrumb from "../../component/Breadcrumb";
-import Button from "../../component/Button";
 import Sidebar from "../../component/Sidebar";
-import Cookie from 'js-cookie'
+import Cookie from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+interface TypeLiveStock {
+  id: number;
+  type: string;
+  certificate_color: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone_number: string;
+  address: string;
+  role: string;
+  is_active: boolean;
+  otp: string;
+}
+
 interface RequestProps {
-  livestock_gender?: string
-  identification_number?: string
-  straw_number?: string
-  father_number?: string
-  mother_number?: string
-  age?: string
-  menpan_data_code?: string
-  status?: string
-  return_date?: string
-  return_description?: string
-  certificate_number?: string
-  type_livestock_id?: string
-  user_id?: string
+  id: string;
+  livestock_gender?: string;
+  identification_number?: string;
+  straw_number?: string;
+  father_number?: string;
+  mother_number?: string;
+  age?: string;
+  menpan_data_code?: string;
+  status?: string;
+  return_date?: string;
+  return_description?: string;
+  certificate_number?: string;
+  type_livestock_id?: string;
+  user_id?: string;
+  length?: number;
+  type_live_stock?: TypeLiveStock;
+  user?: User;
 }
 
 const Request = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
-  const [data, setData] = useState<RequestProps>();
+  const [data, setData] = useState<RequestProps[]>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
 
@@ -42,7 +64,7 @@ const Request = () => {
       })
       .then((res) => {
         console.log(res?.data?.data?.data);
-        
+
         setData(res?.data?.data?.data);
       })
       .catch((err) => {
@@ -51,8 +73,8 @@ const Request = () => {
   };
 
   useEffect(() => {
-    getData()
-  }, [])
+    getData();
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -84,22 +106,46 @@ const Request = () => {
                   <td>No Straw</td>
                   <td>Jenis Ternak</td>
                   <td>No Identitas Ternak</td>
+                  {role === "admin" || role === "leader" ? (
+                    <td>Status</td>
+                  ) : null}
                   <td></td>
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                {data?.length > 0 ? (
+                {data && data?.length > 0 ? (
                   data?.map((item: RequestProps, index: number) => {
                     return (
                       <tr className="border-b-gray-200" key={index}>
                         <td>{index + 1}</td>
                         <td>{item?.user?.name}</td>
                         <td>{item?.straw_number}</td>
-                        <td>{item?.type_live_stock?.type?.toLocaleUpperCase()}</td>
-                        <td>{item?.identification_number}</td>
                         <td>
-                          <i className="fa-solid fa-pen-to-square cursor-pointer ml-2"></i>
-                          <i className="fa-solid fa-trash cursor-pointer ml-2"></i>
+                          {item?.type_live_stock?.type?.toLocaleUpperCase()}
+                        </td>
+                        <td>{item?.identification_number}</td>
+                        {role === "admin" || role === "leader" ? (
+                          <td>
+                            {item?.status == "1"
+                              ? "Verifikator 1"
+                              : item?.status == "2"
+                              ? "Petugas"
+                              : item?.status == "3"
+                              ? "Verifikator 2"
+                              : item?.status == "4"
+                              ? "Pimpinan"
+                              : item?.status == "0"
+                              ? "Ditolak"
+                              : "Permohonan Diterima"}
+                          </td>
+                        ) : null}
+                        <td>
+                          {role === "verifier I" || role === "verifier II" ? (
+                            <i className="fa-solid fa-circle-check ml-2"></i>
+                          ) : null}
+                          {role === "admin" || role === "leader" ? (
+                            <i className="fa-solid fa-trash cursor-pointer ml-2"></i>
+                          ) : null}
                         </td>
                       </tr>
                     );
@@ -117,7 +163,7 @@ const Request = () => {
         </div>
       </main>
     </section>
-  )
-}
+  );
+};
 
-export default Request
+export default Request;

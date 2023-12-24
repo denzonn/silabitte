@@ -12,15 +12,17 @@ import { useFormik } from "formik";
 import { validateType } from "../../validation/auth";
 
 interface TypeProps {
+  id: string;
   type?: string;
   certificate_color?: string;
+  length?: number;
 }
 
 const Type = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
-  const [data, setData] = useState<TypeProps>();
+  const [data, setData] = useState<TypeProps[]>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
@@ -143,7 +145,7 @@ const Type = () => {
         loading: "Menghapus...",
         success: "Berhasil Menghapus Tipe Ternak...",
         error: (error) => {
-          toast.error(error.message);
+          return toast.error(error.message);
         },
       }
     );
@@ -198,7 +200,7 @@ const Type = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                {data?.length > 0 ? (
+                {data && data?.length > 0 ? (
                   data?.map((item: TypeProps, index: number) => {
                     return (
                       <tr className="border-b-gray-200" key={index}>

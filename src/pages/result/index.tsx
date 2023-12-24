@@ -1,60 +1,60 @@
-import axios from "axios";
-import Breadcrumb from "../../component/Breadcrumb";
-import Button from "../../component/Button";
-import Sidebar from "../../component/Sidebar";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import Cookie from 'js-cookie'
+// import axios from "axios";
+// import Breadcrumb from "../../component/Breadcrumb";
+// import Button from "../../component/Button";
+// import Sidebar from "../../component/Sidebar";
+// import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import toast from "react-hot-toast";
+// import Cookie from 'js-cookie'
 
 const Result = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
-  const [data, setData] = useState<TypeProps>();
-  const token = Cookie.get("token");
-  const role = Cookie.get("role");
-  const [id, setId] = useState<number>(0);
+  // const [data, setData] = useState<TypeProps>();
+  // const token = Cookie.get("token");
+  // const role = Cookie.get("role");
+  // const [id, setId] = useState<number>(0);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const [add, setAdd] = useState<boolean>(false);
-  const [edit, setEdit] = useState<boolean>(false);
+  // const [add, setAdd] = useState<boolean>(false);
+  // const [edit, setEdit] = useState<boolean>(false);
 
-  const getData = () => {
-    axios
-      .get("/api/type-livestock", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setData(res?.data?.data?.data);
-      })
-      .catch((err) => {
-        toast.error(err.message);
-      });
-  };
+  // const getData = () => {
+  //   axios
+  //     .get("/api/type-livestock", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       setData(res?.data?.data?.data);
+  //     })
+  //     .catch((err) => {
+  //       toast.error(err.message);
+  //     });
+  // };
 
-  useEffect(() => {
-    if (!token) {
-      setTimeout(() => {
-        toast.error("Silahkan login terlebih dahulu");
-      }, 2000);
-      navigate("/");
-    }
+  // useEffect(() => {
+  //   if (!token) {
+  //     setTimeout(() => {
+  //       toast.error("Silahkan login terlebih dahulu");
+  //     }, 2000);
+  //     navigate("/");
+  //   }
 
-    if (role !== 'admin') {
-      navigate("/dashboard");
-    }
-  }, [token, navigate, role]);
+  //   if (role !== 'admin') {
+  //     navigate("/dashboard");
+  //   }
+  // }, [token, navigate, role]);
 
   return (
     <section>
       <div className="bg-primary w-full h-[40vh] fixed top-0 left-0 z-0"></div>
       <Sidebar />
 
-      <main className="ml-72 px-6 pt-5 z-10 relative">
+      {/* <main className="ml-72 px-6 pt-5 z-10 relative">
         <Breadcrumb pages="Data Jenis Ternak" />
 
         <div className="bg-white rounded-2xl">
@@ -112,7 +112,7 @@ const Result = () => {
             </table>
           </div>
         </div>
-      </main>
+      </main> */}
     </section>
   );
 };

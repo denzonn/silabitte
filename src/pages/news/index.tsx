@@ -14,23 +14,25 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 interface NewsProps {
+  id: string;
   title?: string;
-  image?: string;
-  content?: string;
+  image?: string | null
+  content?: string | TrustedHTML
+  length?: string
 }
 
 const News = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
-  const [data, setData] = useState<NewsProps>();
-  const [editData, setEditData] = useState<NewsProps>();
+  const [data, setData] = useState<NewsProps[]>();
+  const [editData, setEditData] = useState<NewsProps[]>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
   
   const [showPhoto, setShowPhoto] = useState<boolean>(false);
-  const [searchData, setSearchData] = useState<NewsProps>();
+  const [searchData, setSearchData] = useState<NewsProps[]>();
   const [page, setPage] = useState<number>(1);
   const [lastPage, setLastPage] = useState<number>();
 
@@ -171,7 +173,7 @@ const News = () => {
         loading: "Menghapus...",
         success: "Berhasil Menghapus Berita...",
         error: (error) => {
-          toast.error(error.message);
+          return toast.error(error.message);
         },
       }
     );
@@ -207,7 +209,7 @@ const News = () => {
   }, [searchFormik.values.search]);
 
   // Update searchData after fetching results
-  const updateSearchData = (data) => {
+  const updateSearchData = (data: any) => {
     setSearchData(data);
   };
 
@@ -279,7 +281,7 @@ const News = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                {searchData?.length > 0 && searchFormik.values.search !== "" ? (
+                {searchData && searchData?.length > 0 && searchFormik.values.search !== "" ? (
                   searchData?.map((item: NewsProps, index: number) => {
                     return (
                       <tr className="border-b-gray-200" key={index}>
@@ -433,7 +435,6 @@ const News = () => {
                         const data = editor.getData();
                         formik.setFieldValue("content", data);
                       }}
-                      className="my-custom-ckeditor"
                     />
                   </div>
                   <div className="py-2">
@@ -540,7 +541,6 @@ const News = () => {
                         const data = editor.getData();
                         editFormik.setFieldValue("content", data);
                       }}
-                      className="my-custom-ckeditor"
                     />
                   </div>
                   <div className="py-2">

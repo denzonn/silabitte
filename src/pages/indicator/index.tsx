@@ -11,7 +11,16 @@ import { useFormik } from "formik";
 import { validateIndicator } from "../../validation/auth";
 import { useNavigate } from "react-router-dom";
 
+interface TypeLiveStock {
+  id: number;
+  type: string;
+  certificate_color: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface IndicatorProps {
+  id: string;
   indicator?: string;
   unit?: string;
   gender?: string;
@@ -21,13 +30,22 @@ interface IndicatorProps {
   limit_grade_2?: string;
   limit_grade_3?: string;
   type_livestock_id?: string;
+  length?: number;
+  type_live_stock?: TypeLiveStock;
+}
+
+interface TypeProps {
+  id: string;
+  type?: string;
+  certificate_color?: string;
+  length?: number;
 }
 
 const Indicator = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
-  const [data, setData] = useState<IndicatorProps>();
+  const [data, setData] = useState<IndicatorProps[]>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
@@ -36,10 +54,10 @@ const Indicator = () => {
   const [add, setAdd] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
 
-  const [livestock_type, setLivestock_type] = useState<any>();
+  const [livestock_type, setLivestock_type] = useState<TypeProps[]>();
 
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   const getType = () => {
     axios
       .get("/api/type-livestock", {
@@ -181,7 +199,7 @@ const Indicator = () => {
         loading: "Menghapus...",
         success: "Berhasil Menghapus Indikator...",
         error: (error) => {
-          toast.error(error.message);
+          return toast.error(error.message);
         },
       }
     );
@@ -200,7 +218,7 @@ const Indicator = () => {
       navigate("/");
     }
 
-    if (role !== 'admin') {
+    if (role !== "admin") {
       navigate("/dashboard");
     }
   }, [token, navigate, role]);
@@ -237,7 +255,7 @@ const Indicator = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                {data?.length > 0 ? (
+                {data && data?.length > 0 ? (
                   data?.map((item: IndicatorProps, index: number) => {
                     return (
                       <tr className="border-b-gray-200" key={index}>
@@ -249,7 +267,10 @@ const Indicator = () => {
                             className="fa-solid fa-pen-to-square cursor-pointer ml-2"
                             onClick={() => getEditData(item?.id)}
                           ></i>
-                          <i className="fa-solid fa-trash cursor-pointer ml-2" onClick={() => getDestroy(item?.id)}></i>
+                          <i
+                            className="fa-solid fa-trash cursor-pointer ml-2"
+                            onClick={() => getDestroy(item?.id)}
+                          ></i>
                         </td>
                       </tr>
                     );
@@ -294,13 +315,15 @@ const Indicator = () => {
                         <option disabled selected>
                           Pilih Jenis Ternak
                         </option>
-                        {livestock_type?.map((item, index) => {
-                          return (
-                            <option value={item?.id}>
-                              {item?.type?.toLocaleUpperCase()}
-                            </option>
-                          );
-                        })}
+                        {livestock_type?.map(
+                          (item: TypeProps, index: number) => {
+                            return (
+                              <option value={item?.id} key={index}>
+                                {item?.type?.toLocaleUpperCase()}
+                              </option>
+                            );
+                          }
+                        )}
                       </select>
                     </div>
                     <div>
@@ -491,16 +514,21 @@ const Indicator = () => {
                         <option disabled selected>
                           Pilih Jenis Ternak
                         </option>
-                        {livestock_type?.map((item, index) => {
-                          return (
-                            <option
-                              value={item?.id}
-                              selected={item?.id == dataEdit?.type_livestock_id}
-                            >
-                              {item?.type?.toLocaleUpperCase()}
-                            </option>
-                          );
-                        })}
+                        {livestock_type?.map(
+                          (item: TypeProps, index: number) => {
+                            return (
+                              <option
+                                key={index}
+                                value={item?.id}
+                                selected={
+                                  item?.id == dataEdit?.type_livestock_id
+                                }
+                              >
+                                {item?.type?.toLocaleUpperCase()}
+                              </option>
+                            );
+                          }
+                        )}
                       </select>
                     </div>
                     <div>
@@ -554,8 +582,18 @@ const Indicator = () => {
                         <option disabled selected>
                           Pilih Jenis Kelamin
                         </option>
-                        <option value="Male" selected={dataEdit?.gender === 'Male'}>Male</option>
-                        <option value="Female" selected={dataEdit?.gender === 'Female'}>Female</option>
+                        <option
+                          value="Male"
+                          selected={dataEdit?.gender === "Male"}
+                        >
+                          Male
+                        </option>
+                        <option
+                          value="Female"
+                          selected={dataEdit?.gender === "Female"}
+                        >
+                          Female
+                        </option>
                       </select>
                     </div>
                   </div>

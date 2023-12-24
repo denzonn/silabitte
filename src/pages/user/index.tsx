@@ -16,13 +16,14 @@ interface UserProps {
   email?: string;
   role?: string;
   is_active?: string;
+  length?: string
 }
 
 const User = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
-  const [data, setData] = useState<UserProps>();
+  const [data, setData] = useState<UserProps[]>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
 
@@ -98,7 +99,7 @@ const User = () => {
         loading: "Menghapus...",
         success: "Berhasil Menghapus User...",
         error: (error) => {
-          toast.error(error.message);
+          return toast.error(error.message);
         },
       }
     );
@@ -151,7 +152,7 @@ const User = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                {data?.length > 0 ? (
+                {data && data?.length > 0 ? (
                   data?.map((item: UserProps, index: number) => {
                     return (
                       <tr className="border-b-gray-200" key={index}>
