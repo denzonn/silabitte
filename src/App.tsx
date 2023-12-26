@@ -19,7 +19,6 @@ const App = () => {
         <Route element={<Dashboard/>} path="/dashboard"/>
         <Route element={<User/>} path="/user"/>
         <Route element={<Type/>} path="/type"/>
-        <Route element={<Result/>} path="/result"/>
         <Route element={<Indicator/>} path="/indicator"/>
         <Route element={<Request/>} path="/request"/>
         <Route element={<News/>} path="/news"/>

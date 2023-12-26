@@ -2,12 +2,46 @@ import Cookie from "js-cookie";
 import Sidebar from "../../component/Sidebar";
 import Breadcrumb from "../../component/Breadcrumb";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
+interface DashboardProps {
+  cancel?: string
+  verifierOne?: string
+  verifierTwo?: string
+  officer?: string
+  notYetVerified?: string
+  verified?: string
+}
 
 const Dashboard = () => {
   const rootElement = document.documentElement;
   rootElement.style.backgroundColor = "#FAFAFA";
 
   const role = Cookie.get("role");
+  const token = Cookie.get("token");
+
+  const [data, setData] = useState<DashboardProps>();
+  
+  const getData = () => {
+    axios
+      .get("/api/dashboard", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setData(res?.data?.data);
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
+  };
+
+  useEffect(() => {
+    getData()
+  }, [])
 
   return (
     <section>
@@ -39,19 +73,19 @@ const Dashboard = () => {
                 </div>
                 <div className="grid grid-cols-4 gap-x-2">
                   <div className="w-full bg-[#fcf5c7] text-[#8b7e2a] text-2xl mt-2 rounded-lg px-5 py-3 font-semibold">
-                    12
-                    <div className="text-sm font-normal">Proses</div>
+                    {data?.cancel}
+                    <div className="text-sm font-normal">Ditolak</div>
                   </div>
                   <div className="w-full bg-[#fcf5c7] text-[#8b7e2a] text-2xl mt-2 rounded-lg px-5 py-3 font-semibold">
-                    12
+                    {data?.verifierOne}
                     <div className="text-sm font-normal">Verifikator 1</div>
                   </div>
                   <div className="w-full bg-[#fcf5c7] text-[#8b7e2a] text-2xl mt-2 rounded-lg px-5 py-3 font-semibold">
-                    12
+                    {data?.officer}
                     <div className="text-sm font-normal">Petugas</div>
                   </div>
                   <div className="w-full bg-[#fcf5c7] text-[#8b7e2a] text-2xl mt-2 rounded-lg px-5 py-3 font-semibold">
-                    12
+                    {data?.verifierTwo}
                     <div className="text-sm font-normal">Verifikator 2</div>
                   </div>
                 </div>
@@ -72,11 +106,11 @@ const Dashboard = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-x-2">
                   <div className="w-full bg-[#fcf5c7] text-[#8b7e2a] text-2xl mt-2 rounded-lg px-5 py-3 font-semibold">
-                    12
+                    {data?.notYetVerified}
                     <div className="text-sm font-normal">Belum Terverifikasi</div>
                   </div>
                   <div className="w-full bg-[#fcf5c7] text-[#8b7e2a] text-2xl mt-2 rounded-lg px-5 py-3 font-semibold">
-                    12
+                  {data?.verified}
                     <div className="text-sm font-normal">Terverifikasi</div>
                   </div>
                 </div>

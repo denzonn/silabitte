@@ -170,34 +170,6 @@ const Sidebar = () => {
                 </span>
               </li>
             </Link>
-            {role !== "admin" ? (
-              ""
-            ) : (
-              <Link to="/result">
-                <li
-                  className={`px-5 w-full py-4 rounded-lg ${
-                    pathname === "/result" ? "bg-[#4abdac2e]" : ""
-                  } text-sm flex gap-3 items-center mb-1`}
-                >
-                  <i
-                    className={`fa-solid fa-square-poll-vertical ${
-                      pathname === "/result"
-                        ? "text-[#4abdac]"
-                        : "text-[#67748E]"
-                    }`}
-                  ></i>
-                  <span
-                    className={
-                      pathname === "/result"
-                        ? "text-[#4abdac]"
-                        : "text-[#67748E]"
-                    }
-                  >
-                    Hasil Pengukuran
-                  </span>
-                </li>
-              </Link>
-            )}
             <Link to="/" onClick={() => {Cookie.remove("token"), Cookie.remove('role')}}>
               <li
                 className={`px-5 w-full py-4 rounded-lg ${

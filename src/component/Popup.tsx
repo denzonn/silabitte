@@ -1,8 +1,10 @@
 import { FC, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+
 interface PopupProps {
   onConfirm: () => void;
   children?: React.ReactNode;
+  clasname?: string;
 }
 
 const backdrop = {
@@ -30,7 +32,7 @@ const backdrop = {
   };
   
 
-const Popup: FC<PopupProps> = ({ onConfirm, children }) => {
+const Popup: FC<PopupProps> = ({ onConfirm, children, clasname }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -48,7 +50,7 @@ const Popup: FC<PopupProps> = ({ onConfirm, children }) => {
   }, [onConfirm]);
 
   const modalOverlayStyle = 'fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 overflow-auto py-5'
-  const modalContentStyle = 'rounded-md'
+  const modalContentStyle = `${clasname} rounded-md`
   
   return (
     <div>
