@@ -16,9 +16,9 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 interface NewsProps {
   id: string;
   title?: string;
-  image?: string | null
-  content?: string | TrustedHTML
-  length?: string
+  image?: string;
+  content?: string | TrustedHTML;
+  length?: string;
 }
 
 const News = () => {
@@ -26,11 +26,11 @@ const News = () => {
   rootElement.style.backgroundColor = "#FAFAFA";
 
   const [data, setData] = useState<NewsProps[]>();
-  const [editData, setEditData] = useState<NewsProps[]>();
+  const [editData, setEditData] = useState<NewsProps>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
-  
+
   const [showPhoto, setShowPhoto] = useState<boolean>(false);
   const [searchData, setSearchData] = useState<NewsProps[]>();
   const [page, setPage] = useState<number>(1);
@@ -79,7 +79,9 @@ const News = () => {
     onSubmit: (values) => {
       const formData = new FormData();
       formData.append("title", values.title);
-      formData.append("image", values.image);
+      if (values.image !== null) {
+        formData.append("image", values.image);
+      }
       formData.append("content", values.content);
 
       axios
@@ -116,7 +118,7 @@ const News = () => {
       });
   };
 
-  const initializeFormik = (data: any) => {
+  const initializeFormik = (data: NewsProps) => {
     editFormik.setFieldValue("title", data?.title || "");
     editFormik.setFieldValue("content", data?.content || 0);
     editFormik.setFieldValue("image", data?.image || null);
@@ -133,7 +135,9 @@ const News = () => {
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("content", values.content);
-      formData.append("image", values.image);
+      if (values.image !== null) {
+        formData.append("image", values.image);
+      }
       formData.append("_method", "PUT");
 
       axios
@@ -225,7 +229,7 @@ const News = () => {
       navigate("/");
     }
 
-    if (role !== 'admin') {
+    if (role !== "admin") {
       navigate("/dashboard");
     }
   }, [token, navigate, role]);
@@ -281,7 +285,9 @@ const News = () => {
                 </tr>
               </thead>
               <tbody className="text-[#344767]">
-                {searchData && searchData?.length > 0 && searchFormik.values.search !== "" ? (
+                {searchData &&
+                searchData?.length > 0 &&
+                searchFormik.values.search !== "" ? (
                   searchData?.map((item: NewsProps, index: number) => {
                     return (
                       <tr className="border-b-gray-200" key={index}>
@@ -295,9 +301,11 @@ const News = () => {
                         </td>
                         <td>{item?.title}</td>
                         <td>
-                          <div
-                            dangerouslySetInnerHTML={{ __html: item?.content }}
-                          ></div>
+                          {item?.content && (
+                            <div
+                              dangerouslySetInnerHTML={{ __html: item.content }}
+                            ></div>
+                          )}
                         </td>
                         <td>
                           <i
@@ -326,9 +334,11 @@ const News = () => {
                         </td>
                         <td>{item?.title}</td>
                         <td>
-                          <div
-                            dangerouslySetInnerHTML={{ __html: item?.content }}
-                          ></div>
+                          {item?.content && (
+                            <div
+                              dangerouslySetInnerHTML={{ __html: item.content }}
+                            ></div>
+                          )}
                         </td>
                         <td>
                           <i
@@ -357,13 +367,17 @@ const News = () => {
             <div className="flex flex-row gap-x-3 w-full justify-end">
               <Button
                 label="Prev"
-                className={`w-28 bg-gray-400 hover:bg-gray-300 ${page === 1 ? "cursor-not-allowed" : ""}`}
+                className={`w-28 bg-gray-400 hover:bg-gray-300 ${
+                  page === 1 ? "cursor-not-allowed" : ""
+                }`}
                 other
                 onClick={() => prevPage()}
               />
               <Button
                 label="Next"
-                className={`w-28 ${page === lastPage ? "cursor-not-allowed" : ""}`}
+                className={`w-28 ${
+                  page === lastPage ? "cursor-not-allowed" : ""
+                }`}
                 onClick={() => nextPage()}
               />
             </div>
@@ -431,7 +445,7 @@ const News = () => {
                     <CKEditor
                       editor={ClassicEditor}
                       data={formik.values.content}
-                      onChange={(event, editor) => {
+                      onChange={(_event, editor) => {
                         const data = editor.getData();
                         formik.setFieldValue("content", data);
                       }}
@@ -537,7 +551,7 @@ const News = () => {
                     <CKEditor
                       editor={ClassicEditor}
                       data={editFormik.values.content}
-                      onChange={(event, editor) => {
+                      onChange={(_event, editor) => {
                         const data = editor.getData();
                         editFormik.setFieldValue("content", data);
                       }}

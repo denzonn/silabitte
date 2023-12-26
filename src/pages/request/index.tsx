@@ -19,6 +19,24 @@ interface TypeLiveStock {
   updated_at: string;
 }
 
+interface Indicator {
+  indicator?: string
+  unit?:string
+}
+
+interface ResultDetail {
+  map(arg0: (item: ResultDetail, index: number) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode;
+  indicator?: Indicator
+  results?: string
+}
+
+interface Result {
+  id: string
+  information?: string
+  image?: string
+  result_detail?: ResultDetail
+}
+
 interface User {
   id: number;
   name: string;
@@ -48,6 +66,9 @@ interface RequestProps {
   length?: number;
   type_live_stock?: TypeLiveStock;
   user?: User;
+  result?: Result
+  livestock_health?: string
+  livestock_reproduction?: string
 }
 
 const Request = () => {
@@ -373,15 +394,15 @@ const Request = () => {
                       <div className="text-lg mt-3">Hasil Pengukuran</div>
                       <div className="text-gray-600 font-light">
                         <div>Informasi : {detailData?.result?.information}</div>
-                        {detailData &&
+                        {detailData?.result?.result_detail &&
                           detailData?.result?.result_detail.map(
-                            (item, index: number) => {
+                            (item: ResultDetail, index: number) => {
                               return (
-                                <div className="grid grid-cols-2 gap-x-5">
+                                <div className="grid grid-cols-2 gap-x-5" key={index}>
                                   <div>
                                     Indikator : {item?.indicator?.indicator}
                                   </div>
-                                  <div>Hasil :{item?.results}</div>
+                                  <div>Hasil :{item?.results} {item?.indicator?.unit}</div>
                                 </div>
                               );
                             }
@@ -482,15 +503,15 @@ const Request = () => {
                       <div className="text-lg mt-3">Hasil Pengukuran</div>
                       <div className="text-gray-600 font-light">
                         <div>Informasi : {detailData?.result?.information}</div>
-                        {detailData &&
+                        {detailData?.result?.result_detail &&
                           detailData?.result?.result_detail.map(
-                            (item, index: number) => {
+                            (item: ResultDetail, index: number) => {
                               return (
-                                <div className="grid grid-cols-2 gap-x-5">
+                                <div className="grid grid-cols-2 gap-x-5" key={index}>
                                   <div>
                                     Indikator : {item?.indicator?.indicator}
                                   </div>
-                                  <div>Hasil :{item?.results}</div>
+                                  <div>Hasil :{item?.results} {item?.indicator?.unit}</div>
                                 </div>
                               );
                             }

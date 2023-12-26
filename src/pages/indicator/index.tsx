@@ -135,7 +135,7 @@ const Indicator = () => {
       });
   };
 
-  const initializeFormik = (data: any) => {
+  const initializeFormik = (data: IndicatorProps) => {
     editFormik.setValues({
       indicator: data?.indicator || "",
       unit: data?.unit || "",

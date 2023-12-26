@@ -12,6 +12,7 @@ import { validateUser } from "../../validation/auth";
 import { useNavigate } from "react-router-dom";
 
 interface UserProps {
+  id: string
   name?: string;
   email?: string;
   role?: string;

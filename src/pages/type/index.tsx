@@ -47,7 +47,7 @@ const Type = () => {
       });
   };
 
-  const handleChangeCertificateColor = (event) => {
+  const handleChangeCertificateColor = (event: any) => {
     formik.setFieldValue("certificate_color", event.target.value);
   };
 
@@ -98,7 +98,7 @@ const Type = () => {
   };
 
 
-  const handleEditChangeCertificateColor = (event) => {
+  const handleEditChangeCertificateColor = (event: any) => {
     editFormik.setFieldValue("certificate_color", event.target.value);
   };
 

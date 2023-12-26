@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from './pages/login'
 import User from "./pages/user";
 import Type from "./pages/type";
-import Result from "./pages/result";
 import Indicator from "./pages/indicator";
 import Request from "./pages/request";
 import News from "./pages/news";
