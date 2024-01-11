@@ -1,5 +1,3 @@
-import React from "react";
-
 const Policy = () => {
   return (
     <div className="px-10 py-5">
