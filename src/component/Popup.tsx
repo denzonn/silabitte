@@ -35,6 +35,7 @@ const backdrop = {
 const Popup: FC<PopupProps> = ({ onConfirm, children, clasname }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleClickOutside = (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       onConfirm();
@@ -47,7 +48,7 @@ const Popup: FC<PopupProps> = ({ onConfirm, children, clasname }) => {
     return () => {
       window.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [onConfirm]);
+  }, [handleClickOutside, onConfirm]);
 
   const modalOverlayStyle = 'fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 overflow-auto py-5'
   const modalContentStyle = `${clasname} rounded-md`

@@ -470,8 +470,8 @@ const News = () => {
             setEdit(false);
           }}
         >
-          <div className="relative w-[60vw] max-h-full">
-            <div className="relative w-full bg-white rounded-lg shadow">
+          <div className="relative w-[65vw] ">
+            <div className="relative w-full bg-white rounded-lg shadow h-[90vh] overflow-auto news">
               <div className="px-6 py-6 lg:px-8">
                 <div className="mb-4 text-xl text-center font-bold text-black">
                   Edit Berita

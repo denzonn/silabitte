@@ -53,3 +53,7 @@ export const validateNews = yup.object({
 export const validateStatus = yup.object({
   status: yup.string().required("Anda Harus Memasukkan Statusnya"),
 });
+
+export const validateRequestDetail = yup.object({
+  
+});
