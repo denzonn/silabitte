@@ -27,6 +27,8 @@ const User = () => {
   const [data, setData] = useState<UserProps[]>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
+  const [page, setPage] = useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>();
 
   const navigate = useNavigate();
 
@@ -34,13 +36,14 @@ const User = () => {
 
   const getData = () => {
     axios
-      .get("/api/user", {
+      .get(`/api/user?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
         setData(res?.data?.data?.data);
+        setLastPage(res?.data?.data?.last_page);
       })
       .catch((err) => {
         toast.error(err.message);
@@ -80,7 +83,7 @@ const User = () => {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [page]);
 
   const getDestroy = (id: string) => {
     toast.promise(
@@ -104,6 +107,18 @@ const User = () => {
         },
       }
     );
+  };
+
+  const nextPage = () => {
+    if (lastPage !== page) {
+      setPage(page + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
   };
 
   useEffect(() => {
@@ -177,6 +192,23 @@ const User = () => {
                 )}
               </tbody>
             </table>
+            <div className="flex flex-row gap-x-3 w-full justify-end mt-3">
+              <Button
+                label="Prev"
+                className={`px-6 bg-gray-400 hover:bg-gray-300 ${
+                  page === 1 ? "cursor-not-allowed" : ""
+                }`}
+                other
+                onClick={() => prevPage()}
+              />
+              <Button
+                label="Next"
+                className={`px-6 ${
+                  page === lastPage ? "bg-gray-400 cursor-not-allowed" : ""
+                }`}
+                onClick={() => nextPage()}
+              />
+            </div>
           </div>
         </div>
       </main>

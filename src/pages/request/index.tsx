@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import RequestComp from "../../component/Request";
+import Button from "../../component/Button";
 
 interface RequestProps {
   id: string;
@@ -36,18 +37,21 @@ const Request = () => {
   const [data, setData] = useState<RequestProps[]>();
   const token = Cookie.get("token");
   const role = Cookie.get("role");
+  const [page, setPage] = useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>();
 
   const navigate = useNavigate();
 
   const getData = () => {
     axios
-      .get("/api/request", {
+      .get(`/api/request?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
         setData(res?.data?.data?.data);
+        setLastPage(res?.data?.data?.last_page);
       })
       .catch((err) => {
         toast.error(err.message);
@@ -84,12 +88,6 @@ const Request = () => {
     navigate(`/detail-request-data/${id}`);
   };
 
-  // const getDetailData = (id: string) => {
-  //   Cookie.set("id", id);
-
-  //   navigate(`/detail-request/${id}`);
-  // };
-
   const confirmStatus = (id: string) => {
     axios
       .put(
@@ -114,9 +112,21 @@ const Request = () => {
       });
   }
 
+  const nextPage = () => {
+    if (lastPage !== page) {
+      setPage(page + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
   useEffect(() => {
     getData();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     if (!token) {
@@ -182,6 +192,23 @@ const Request = () => {
                 )}
               </tbody>
             </table>
+            <div className="flex flex-row gap-x-3 w-full justify-end mt-3">
+              <Button
+                label="Prev"
+                className={`px-6 bg-gray-400 hover:bg-gray-300 ${
+                  page === 1 ? "cursor-not-allowed" : ""
+                }`}
+                other
+                onClick={() => prevPage()}
+              />
+              <Button
+                label="Next"
+                className={`px-6 ${
+                  page === lastPage ? "bg-gray-400 cursor-not-allowed" : ""
+                }`}
+                onClick={() => nextPage()}
+              />
+            </div>
           </div>
         </div>
       </main>

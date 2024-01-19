@@ -50,6 +50,8 @@ const Indicator = () => {
   const role = Cookie.get("role");
   const [id, setId] = useState<number>(0);
   const [dataEdit, setDataEdit] = useState<IndicatorProps>();
+  const [page, setPage] = useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>();
 
   const [add, setAdd] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
@@ -75,13 +77,14 @@ const Indicator = () => {
 
   const getData = () => {
     axios
-      .get("/api/indicator", {
+      .get(`/api/indicator?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
         setData(res?.data?.data?.data);
+        setLastPage(res?.data?.data?.last_page);
       })
       .catch((err) => {
         toast.error(err.message);
@@ -205,10 +208,22 @@ const Indicator = () => {
     );
   };
 
+  const nextPage = () => {
+    if (lastPage !== page) {
+      setPage(page + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
   useEffect(() => {
     getType();
     getData();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     if (!token) {
@@ -284,6 +299,23 @@ const Indicator = () => {
                 )}
               </tbody>
             </table>
+            <div className="flex flex-row gap-x-3 w-full justify-end mt-3">
+              <Button
+                label="Prev"
+                className={`px-6 bg-gray-400 hover:bg-gray-300 ${
+                  page === 1 ? "cursor-not-allowed" : ""
+                }`}
+                other
+                onClick={() => prevPage()}
+              />
+              <Button
+                label="Next"
+                className={`px-6 ${
+                  page === lastPage ? "bg-gray-400 cursor-not-allowed" : ""
+                }`}
+                onClick={() => nextPage()}
+              />
+            </div>
           </div>
         </div>
       </main>

@@ -364,10 +364,10 @@ const News = () => {
                 )}
               </tbody>
             </table>
-            <div className="flex flex-row gap-x-3 w-full justify-end">
+            <div className="flex flex-row gap-x-3 w-full justify-end mt-3">
               <Button
                 label="Prev"
-                className={`w-28 bg-gray-400 hover:bg-gray-300 ${
+                className={`px-6 bg-gray-400 hover:bg-gray-300 ${
                   page === 1 ? "cursor-not-allowed" : ""
                 }`}
                 other
@@ -375,7 +375,7 @@ const News = () => {
               />
               <Button
                 label="Next"
-                className={`w-28 ${
+                className={`px-6 ${
                   page === lastPage ? "cursor-not-allowed" : ""
                 }`}
                 onClick={() => nextPage()}

@@ -35,6 +35,8 @@ const DetailVerifRequest = () => {
   const [data, setData] = useState<RequestProps>();
   const token = Cookie.get("token");
   const id = Cookie.get("id");
+  const role = Cookie.get("role");
+  const [certificate, setCertificate] = useState<any>();
 
   const navigate = useNavigate();
 
@@ -57,6 +59,31 @@ const DetailVerifRequest = () => {
     Cookie.set("id_data", id);
 
     navigate(`/detail-request-result/${id}`);
+  };
+
+  const getSertificate = (id: string) => {
+    axios
+      .get(`api/request/certificate/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob", // Set tipe respons ke blob untuk file
+      })
+      .then((res) => {
+        const fileName = `certificate_${id}.pdf`; // Gantilah dengan nama file yang sesuai
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+
+        // Buat tautan untuk mengunduh file
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   useEffect(() => {
@@ -99,6 +126,7 @@ const DetailVerifRequest = () => {
                   <td>Jenis Ternak</td>
                   <td>Kesehatan Ternak</td>
                   <td>Status</td>
+                  {role === "admin" ? <td>Sertifikat</td> : null}
                   <td></td>
                 </tr>
               </thead>
@@ -118,6 +146,16 @@ const DetailVerifRequest = () => {
                             ? "Menunggu Proses"
                             : "Ditolak"}
                         </td>
+                        {role === "admin" && item?.status === "5" ? (
+                          <td>
+                            <button
+                              className="bg-green-500 px-3 p-1 rounded-md"
+                              onClick={() => getSertificate(item?.id)}
+                            >
+                              <i className="fa-solid fa-download text-white"></i>
+                            </button>
+                          </td>
+                        ) : <td></td>}
                         <td>
                           <div>
                             {item?.status === "3" ? (
@@ -126,9 +164,29 @@ const DetailVerifRequest = () => {
                                 onClick={() => getDetailData(item?.id)}
                               ></i>
                             ) : item?.status === "0" ? (
-                              <i className="fa-solid fa-circle-xmark cursor-pointer ml-2 text-red-500"></i>
+                              <div className="flex flex-row gap-x-3">
+                                <div>
+                                  <i
+                                    className="fa-solid fa-eye cursor-pointer ml-2"
+                                    onClick={() => getDetailData(item?.id)}
+                                  ></i>
+                                </div>
+                                <div>
+                                  <i className="fa-solid fa-circle-xmark cursor-pointer ml-2 text-red-500"></i>
+                                </div>
+                              </div>
                             ) : (
-                              <i className="fa-solid fa-circle-check cursor-pointer ml-2 text-green-600"></i>
+                              <div className="flex flex-row gap-x-3">
+                                <div>
+                                  <i
+                                    className="fa-solid fa-eye cursor-pointer ml-2"
+                                    onClick={() => getDetailData(item?.id)}
+                                  ></i>
+                                </div>
+                                <div>
+                                  <i className="fa-solid fa-circle-check cursor-pointer ml-2 text-green-600"></i>
+                                </div>
+                              </div>
                             )}
                           </div>
                         </td>
