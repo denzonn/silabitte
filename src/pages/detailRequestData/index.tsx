@@ -7,6 +7,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 interface RequestProps {
+  map(arg0: (item: RequestProps, index: number) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode;
   id: string;
   file_name?: string;
   total_livestock?: string;
@@ -36,7 +37,6 @@ const DetailVerifRequest = () => {
   const token = Cookie.get("token");
   const id = Cookie.get("id");
   const role = Cookie.get("role");
-  const [certificate, setCertificate] = useState<any>();
 
   const navigate = useNavigate();
 

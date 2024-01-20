@@ -50,6 +50,7 @@ interface ResultProps {
 }
 
 type ResultDetailProps = {
+  map(arg0: (item: ResultDetailProps, index: number) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode;
   id?: string;
   results?: string;
   indicator?: IndicatorProps;
