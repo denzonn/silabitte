@@ -112,6 +112,30 @@ const Request = () => {
       });
   }
 
+  const confirmStatusLeader = (id: string) => {
+    axios
+      .put(
+        `/api/request-file/status/${id}`,
+        {
+          status: 5,
+          return_description: null,
+          return_date: null,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success("Berhasil Memverifikasi Data");
+        getData();
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
+  }
+
   const nextPage = () => {
     if (lastPage !== page) {
       setPage(page + 1);
@@ -180,6 +204,7 @@ const Request = () => {
                         getDetailVerif={() => getDetailVerif(item?.id)}
                         getVerif={() => getVerif(item?.id)}
                         confirmStatus={() => confirmStatus(item?.id)}
+                        confirmStatusLeader={() => confirmStatusLeader(item?.id)}
                       />
                     );
                   })
